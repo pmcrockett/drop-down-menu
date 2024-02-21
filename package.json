@@ -1,0 +1,24 @@
+{
+  "name": "PROJECT NAME",
+  "version": "1.0.0",
+  "description": "PROJECT DESCRIPTION",
+  "type": "module",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack serve --open --config webpack.config.js",
+    "build": "webpack --config webpack.config.js"
+  },
+  "author": "pmcrockett",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "prettier": "3.2.5",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  },
+  "dependencies": {
+  }
+}

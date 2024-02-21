@@ -1,0 +1,13 @@
+/* @font-face {
+  font-family: Custom-Font;
+  src: url(./FONT_NAME.ttf);
+} */
+
+* {
+  margin: 0px;
+}
+
+:root {
+  user-select: none;
+  /* font-family: Custom-Font, Arial, Helvetica, sans-serif; */
+}
