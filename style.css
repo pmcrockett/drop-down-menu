@@ -3,11 +3,102 @@
   src: url(./FONT_NAME.ttf);
 } */
 
-* {
+/* * {
+  margin: 0px;
+} */
+
+/* :root {
+  user-select: none;
+  font-family: Custom-Font, Arial, Helvetica, sans-serif;
+} */
+
+.dropdown {
+  --dropdown-vert-margin: 4px;
+  --dropdown-border-width: 2px;
+  --dropdown-font-color: rgb(65, 53, 38);
+  --dropdown-font-size: 18px;
+
+  margin: 0px;
+  color: var(--dropdown-font-color);
+  background-color: antiquewhite;
+  border-color: burlywood;
+  border-style: solid;
+  border-width: var(--dropdown-border-width);
+  padding: 0px;
+  width: fit-content;
+  box-shadow: 2px 2px 4px black;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: var(--dropdown-font-size);
+}
+
+.dropdown * {
   margin: 0px;
 }
 
-:root {
-  user-select: none;
-  /* font-family: Custom-Font, Arial, Helvetica, sans-serif; */
+.dropdown ul {
+  padding: var(--dropdown-vert-margin) 1em var(--dropdown-vert-margin) 1em;
+  min-width: max-content;
+}
+
+.dropdown .dropdown-spacer {
+  background-color: burlywood;
+  height: var(--dropdown-border-width);
+  margin: calc(0.5em + var(--dropdown-vert-margin)) 1em
+    calc(0.5em + var(--dropdown-vert-margin)) 1em;
+  padding: 0px;
+  width: auto;
+}
+
+.dropdown a:link,
+.dropdown a:visited,
+.dropdown a:hover,
+.dropdown a:active {
+  color: var(--dropdown-font-color);
+  text-decoration: none;
+}
+
+.submenu-origin {
+  display: grid;
+  grid-template-columns: auto;
+  align-items: center;
+  position: relative;
+}
+
+.submenu-origin > * {
+  grid-area: 1 / 1 / 2 / 2;
+}
+
+.dropdown-expand-img {
+  justify-self: end;
+  height: 1em;
+  width: 1em;
+  fill: var(--dropdown-font-color);
+  position: relative;
+  right: -0.9em;
+}
+
+.dropdown > ul:not(.dropdown-spacer):hover,
+.dropdown > ul.submenu-origin.highlighted {
+  background-color: darkolivegreen;
+}
+
+.submenu-origin > .dropdown {
+  display: none;
+}
+
+/* .submenu-origin:hover > .dropdown { */
+.submenu-origin.opened > .dropdown {
+  display: block;
+  position: absolute;
+  left: calc(100% + 1em);
+  top: calc(
+    calc(
+      calc(calc(100% - 1em) - calc(var(--dropdown-vert-margin) * 2)) -
+        var(--dropdown-border-width) + 1px
+    )
+  );
+}
+
+.hidden {
+  display: none;
 }
