@@ -15,7 +15,7 @@ export default [
       ecmaVersion: "latest",
     },
     plugins: { underscore: underscorePlugin },
-    ignorePatterns: ["dist/main.js"],
+    ignores: ["dist/main.js"],
     rules: {
       "underscore/require-param-underscore": "warn",
       "multiline-comment-style": ["warn", "separate-lines"],
