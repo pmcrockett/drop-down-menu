@@ -1,18 +1,18 @@
 import * as dom from "./dom-utilities.js";
 
-class dropDownMenu {
-  submenuOrigins = [];
+class Dropdown {
+  origins = [];
 
   constructor(_htmlMenu) {
-    const listItems = _htmlMenu.querySelectorAll("ul");
+    this.origins.push(new DropdownOrigin(_htmlMenu));
+    const suborigins = _htmlMenu.querySelectorAll(".dropdown-expand");
 
-    for (const item of listItems) {
-      if (item.classList.contains("submenu-origin")) {
-        this.submenuOrigins.push(new SubmenuOrigin(item));
-      }
+    for (const origin of suborigins) {
+      this.origins.push(new DropdownOrigin(origin));
     }
 
     this.attachHoverListener(_htmlMenu);
+    this.attachClickListener(_htmlMenu);
   }
 
   attachHoverListener(_htmlElem) {
@@ -22,27 +22,47 @@ class dropDownMenu {
         _event.clientY
       );
       let menuUnderMouse;
+
       for (const elem of underMouse) {
         if (elem.classList.contains("dropdown")) {
           menuUnderMouse = elem;
           break;
         }
       }
+
       if (!menuUnderMouse) return;
 
-      const submenus = menuUnderMouse.querySelectorAll(".submenu-origin");
-      console.log(submenus);
+      const submenus = menuUnderMouse.querySelectorAll(
+        ".dropdown-expand, .dropdown-anchor"
+      );
+
       for (const submenu of submenus) {
         submenu.classList.remove("highlighted");
-        setTimeout(() => {
-          submenu.classList.remove("opened");
+        submenu.menuCloseTimeout = setTimeout(() => {
+          if (!submenu.classList.contains("highlighted")) {
+            submenu.classList.remove("opened");
+          }
         }, 500);
+      }
+    });
+  }
+
+  attachClickListener(_htmlElem) {
+    document.addEventListener("click", (_event) => {
+      if (
+        _htmlElem.classList.contains("opened") &&
+        !dom.elementIsOrContainsElement(_htmlElem, _event.target)
+      ) {
+        this.origins.forEach((_origin) => {
+          _origin.htmlElem.classList.remove("highlighted");
+          _origin.htmlElem.classList.remove("opened");
+        });
       }
     });
   }
 }
 
-class SubmenuOrigin {
+class DropdownOrigin {
   enterTime;
   htmlElem;
   menuOpenTimeout;
@@ -63,11 +83,11 @@ class SubmenuOrigin {
 
   attachHoverListener(_htmlElem) {
     _htmlElem.addEventListener("mouseenter", () => {
+      _htmlElem.classList.add("highlighted");
       this.menuOpenTimeout = setTimeout(() => {
         _htmlElem.classList.add("opened");
-        _htmlElem.classList.add("highlighted");
+        clearTimeout(this.menuCloseTimeout);
       }, 500);
-      // clearTimeout(this.menuCloseTimeout);
     });
 
     _htmlElem.addEventListener("mouseleave", (_event) => {
@@ -77,19 +97,13 @@ class SubmenuOrigin {
         _event.clientX,
         _event.clientY
       );
-      let isMenuUnderMouse = false;
 
-      for (const elem of underMouse) {
-        if (elem.classList.contains("dropdown")) {
-          isMenuUnderMouse = true;
-          break;
-        }
-      }
-
-      if (isMenuUnderMouse) {
+      if (dom.nodeListContainsClass(underMouse, "dropdown")) {
         _htmlElem.classList.remove("highlighted");
         this.menuCloseTimeout = setTimeout(() => {
-          _htmlElem.classList.remove("opened");
+          if (!_htmlElem.classList.contains("highlighted")) {
+            _htmlElem.classList.remove("opened");
+          }
         }, 500);
       }
     });
@@ -97,7 +111,7 @@ class SubmenuOrigin {
 }
 
 const menus = [];
-const htmlMenus = document.querySelectorAll(".dropdown");
+const htmlMenus = document.querySelectorAll(".dropdown-anchor");
 for (const menu of htmlMenus) {
-  menus.push(new dropDownMenu(menu));
+  menus.push(new Dropdown(menu));
 }

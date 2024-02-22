@@ -9,54 +9,57 @@
     <title>PROJECT TITLE</title>
   </head>
   <body>
-    <div class="dropdown">
-      <ul>
-        <a href="">Item 1</a>
-      </ul>
-      <ul>
-        <a href="">Item 2</a>
-      </ul>
-      <ul>
-        <a href="">Item 3</a>
-      </ul>
-      <ul class="dropdown-spacer"></ul>
-      <ul class="submenu-origin">
-        <a href="">Item 4</a>
-        <div class="dropdown">
-          <ul>
-            <a href="">Item 1</a>
-          </ul>
-          <ul>
-            <a href="">Item 2</a>
-          </ul>
-          <ul>
-            <a href="">Item 3</a>
-          </ul>
-          <ul class="submenu-origin">
-            <p>Item 3</p>
-            <div class="dropdown">
-              <ul>
-                <a href="">Item 1</a>
-              </ul>
-              <ul>
-                <a href="">Item 2</a>
-              </ul>
-              <ul>
-                <a href="">Item 3</a>
-              </ul>
-            </div>
-          </ul>
-          <ul>
-            <a href="">Item 3</a>
-          </ul>
-        </div>
-      </ul>
-      <ul>
-        <p>Not a link</p>
-      </ul>
-      <ul>
-        <a href="">Item 5</a>
-      </ul>
-    </div>
+    <button class="dropdown-anchor">
+      <p>Foobar</p>
+      <div class="dropdown">
+        <ul>
+          <a href="">Item 1</a>
+        </ul>
+        <ul>
+          <a href="">Item 2</a>
+        </ul>
+        <ul>
+          <a href="">Item 3</a>
+        </ul>
+        <ul class="dropdown-spacer"></ul>
+        <ul class="dropdown-expand">
+          <a href="">Item 4</a>
+          <div class="dropdown">
+            <ul>
+              <a href="">Item 1</a>
+            </ul>
+            <ul>
+              <a href="">Item 2</a>
+            </ul>
+            <ul>
+              <a href="">Item 3</a>
+            </ul>
+            <ul class="dropdown-expand">
+              <p>Item 3</p>
+              <div class="dropdown">
+                <ul>
+                  <a href="">Item 1</a>
+                </ul>
+                <ul>
+                  <a href="">Item 2</a>
+                </ul>
+                <ul>
+                  <a href="">Item 3</a>
+                </ul>
+              </div>
+            </ul>
+            <ul>
+              <a href="">Item 3</a>
+            </ul>
+          </div>
+        </ul>
+        <ul>
+          <p>Not a link</p>
+        </ul>
+        <ul>
+          <a href="">Item 5</a>
+        </ul>
+      </div>
+    </button>
   </body>
 </html>

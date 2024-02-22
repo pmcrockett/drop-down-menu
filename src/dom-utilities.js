@@ -115,3 +115,34 @@ export function addClasses(_elem, _classes) {
     }
   }
 }
+
+export function nodeListContainsClass(_nodeList, _class) {
+  for (const elem of _nodeList) {
+    if (elem.classList.contains(_class)) return true;
+  }
+
+  return false;
+}
+
+export function nodeListContainsElement(_nodeList, _elem) {
+  for (const listElem of _nodeList) {
+    if (listElem === _elem) return true;
+  }
+
+  return false;
+}
+
+export function elementContainsElement(_elem1, _elem2) {
+  const contents = _elem1.querySelectorAll("*");
+
+  for (const elemToCheck of contents) {
+    if (elemToCheck === _elem2) return true;
+  }
+
+  return false;
+}
+
+export function elementIsOrContainsElement(_elem1, _elem2) {
+  if (_elem1 === _elem2) return true;
+  return elementContainsElement(_elem1, _elem2);
+}
