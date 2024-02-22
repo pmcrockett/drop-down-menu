@@ -12,12 +12,18 @@
   font-family: Custom-Font, Arial, Helvetica, sans-serif;
 } */
 
-.dropdown {
+.dropdown-anchor {
   --dropdown-vert-margin: 4px;
   --dropdown-border-width: 2px;
   --dropdown-font-color: rgb(65, 53, 38);
   --dropdown-font-size: 18px;
+  --dropdown-anchor-padding: 6px;
+  --dropdown-anchor-border-width: 2px;
 
+  padding: var(--dropdown-anchor-padding);
+}
+
+.dropdown {
   margin: 0px;
   color: var(--dropdown-font-color);
   background-color: antiquewhite;
@@ -38,13 +44,14 @@
 .dropdown ul {
   padding: var(--dropdown-vert-margin) 1em var(--dropdown-vert-margin) 1em;
   min-width: max-content;
+  text-align: left;
 }
 
 .dropdown .dropdown-spacer {
   background-color: burlywood;
   height: var(--dropdown-border-width);
-  margin: calc(0.5em + var(--dropdown-vert-margin)) 1em
-    calc(0.5em + var(--dropdown-vert-margin)) 1em;
+  margin: calc(0.1em + var(--dropdown-vert-margin)) 1em
+    calc(0.1em + var(--dropdown-vert-margin)) 1em;
   padding: 0px;
   width: auto;
 }
@@ -57,14 +64,17 @@
   text-decoration: none;
 }
 
-.submenu-origin {
+.dropdown-anchor,
+.dropdown-expand {
   display: grid;
   grid-template-columns: auto;
   align-items: center;
   position: relative;
 }
 
-.submenu-origin > * {
+.dropdown-anchor > *,
+.dropdown-expand > * {
+  /* ul > .dropdown > * { */
   grid-area: 1 / 1 / 2 / 2;
 }
 
@@ -78,18 +88,31 @@
 }
 
 .dropdown > ul:not(.dropdown-spacer):hover,
-.dropdown > ul.submenu-origin.highlighted {
+.dropdown-anchor.highlighted,
+.dropdown-expand.highlighted {
   background-color: darkolivegreen;
 }
 
-.submenu-origin > .dropdown {
+.dropdown-anchor > .dropdown,
+.dropdown-expand > .dropdown {
   display: none;
 }
 
-/* .submenu-origin:hover > .dropdown { */
-.submenu-origin.opened > .dropdown {
+.dropdown-anchor.opened > .dropdown,
+.dropdown-expand.opened > .dropdown {
   display: block;
   position: absolute;
+}
+
+.dropdown-anchor.opened > .dropdown {
+  left: calc(
+    calc(0px - var(--dropdown-anchor-padding)) -
+      var(--dropdown-anchor-border-width)
+  );
+  top: calc(calc(100% + var(--dropdown-anchor-padding)));
+}
+
+.dropdown-expand.opened > .dropdown {
   left: calc(100% + 1em);
   top: calc(
     calc(
