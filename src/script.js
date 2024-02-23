@@ -161,9 +161,7 @@ class DropdownOrigin {
     const menu = _htmlElem.querySelector(".dropdown");
     if (!menu) return;
 
-    const svg = dom.createSvg(
-      "M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"
-    );
+    const svg = dom.createSvg("M10,17L15,12L10,7V17Z");
     svg.classList.add("dropdown-expand-img");
     _htmlElem.insertBefore(svg, menu);
   }
