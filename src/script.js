@@ -1,5 +1,47 @@
 import * as dom from "./dom-utilities.js";
 
+class DropdownBar {
+  dropdowns = [];
+
+  constructor(_htmlBar) {
+    const htmlMenus = _htmlBar.querySelectorAll(".dropdown-anchor");
+
+    htmlMenus.forEach((_elem) => {
+      this.dropdowns.push(new Dropdown(_elem));
+    });
+
+    this.attachHoverListeners();
+  }
+
+  attachHoverListeners() {
+    this.dropdowns.forEach((_dropdown) => {
+      this.attachHoverListener(_dropdown);
+    });
+  }
+
+  attachHoverListener(_dropdown) {
+    _dropdown.origins[0].htmlElem.addEventListener("mouseenter", () => {
+      let needMenuOpen = false;
+
+      this.dropdowns.forEach((_menu) => {
+        if (
+          _menu != _dropdown &&
+          _menu.origins[0].htmlElem.classList.contains("opened")
+        ) {
+          needMenuOpen = true;
+          _menu.closeHierarchy();
+        }
+      });
+
+      if (needMenuOpen) {
+        _dropdown.origins[0].htmlElem.classList.add("opened");
+        _dropdown.origins[0].htmlElem.classList.add("highlighted");
+        _dropdown.origins[0].repositionOffscreenMenu();
+      }
+    });
+  }
+}
+
 class Dropdown {
   origins = [];
   hoverDelay;
@@ -16,6 +58,13 @@ class Dropdown {
     this.attachMouseEnterListener(_htmlMenu);
     this.attachClickListener(_htmlMenu);
     this.attachReizeListener();
+  }
+
+  closeHierarchy() {
+    this.origins.forEach((_origin) => {
+      _origin.htmlElem.classList.remove("highlighted");
+      _origin.htmlElem.classList.remove("opened");
+    });
   }
 
   // If we move the mouse back into the opened menu hierarchy, close any opened
@@ -60,10 +109,7 @@ class Dropdown {
         _htmlElem.classList.contains("opened") &&
         !dom.elementIsOrContainsElement(_htmlElem, _event.target)
       ) {
-        this.origins.forEach((_origin) => {
-          _origin.htmlElem.classList.remove("highlighted");
-          _origin.htmlElem.classList.remove("opened");
-        });
+        this.closeHierarchy();
       }
     });
   }
@@ -95,7 +141,10 @@ class DropdownOrigin {
   hoverDelay;
 
   constructor(_htmlElem, _hoverDelay) {
-    this.appendSubmenuArrow(_htmlElem);
+    if (!_htmlElem.classList.contains("dropdown-anchor")) {
+      this.appendSubmenuArrow(_htmlElem);
+    }
+
     this.hoverDelay = _hoverDelay || 500;
 
     if (_htmlElem.getAttribute("onset") === "click") {
@@ -127,18 +176,16 @@ class DropdownOrigin {
     // Ensure default position so we can check whether the menu is offscreen.
     if (this.htmlElem.classList.contains("dropdown-anchor")) {
       this.menuElem.style.left =
-        "calc(calc(0px - var(--dropdown-anchor-padding)) - var(--dropdown-anchor-border-width))";
+        "calc(var(--dropdown-anchor-border-width-horiz) * -1)";
       this.menuElem.style.top =
-        "calc(calc(100% + var(--dropdown-anchor-padding)))";
+        "calc(100% - var(--dropdown-anchor-border-width-vert))";
     } else {
-      this.menuElem.style.left = "calc(100% + 1em)";
-      this.menuElem.style.top =
-        "calc(calc(calc(calc(100% - 1em) - calc(var(--dropdown-vert-margin) * 2)) - var(--dropdown-border-width) + 1px))";
+      this.menuElem.style.left = "100%";
+      this.menuElem.style.top = "calc(var(--dropdown-border-width) * -1)";
     }
 
     const vw = document.documentElement.clientWidth || window.innerWidth;
     const vh = document.documentElement.clientHeight || window.innerHeight;
-    console.log(vw);
     const rect = this.menuElem.getBoundingClientRect();
     const leftStr = window
       .getComputedStyle(this.menuElem)
@@ -220,8 +267,4 @@ class DropdownOrigin {
   }
 }
 
-const menus = [];
-const htmlMenus = document.querySelectorAll(".dropdown-anchor");
-for (const menu of htmlMenus) {
-  menus.push(new Dropdown(menu));
-}
+new DropdownBar(document.querySelector(".dropdown-bar"));
