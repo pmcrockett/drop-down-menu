@@ -12,6 +12,11 @@
   font-family: Custom-Font, Arial, Helvetica, sans-serif;
 } */
 
+/* body {
+  width: 1800px;
+  height: 2500px;
+} */
+
 .dropdown-anchor {
   --dropdown-vert-margin: 4px;
   --dropdown-border-width: 2px;
@@ -39,6 +44,7 @@
 
 .dropdown * {
   margin: 0px;
+  z-index: 1;
 }
 
 .dropdown ul {
@@ -74,7 +80,6 @@
 
 .dropdown-anchor > *,
 .dropdown-expand > * {
-  /* ul > .dropdown > * { */
   grid-area: 1 / 1 / 2 / 2;
 }
 
