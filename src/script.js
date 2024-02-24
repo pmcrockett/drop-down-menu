@@ -138,6 +138,7 @@ class DropdownOrigin {
   enterTime;
   htmlElem;
   menuElem;
+  itemElem;
   menuOpenTimeout;
   menuCloseTimeout;
   hoverDelay;
@@ -148,9 +149,15 @@ class DropdownOrigin {
       this.appendSubmenuArrow(_htmlElem);
       this.popDirection =
         _htmlElem.getAttribute("popdirection") || "right-down";
+      this.itemElem =
+        _htmlElem.querySelector("ul > div:first-child") ||
+        _htmlElem.querySelector("ul > a:first-child");
     } else {
       this.popDirection =
         _htmlElem.getAttribute("popdirection") || "down-right";
+      this.itemElem =
+        _htmlElem.querySelector(".dropdown-anchor > div:first-child") ||
+        _htmlElem.querySelector(".dropdown-anchor > a:first-child");
     }
 
     this.hoverDelay = _hoverDelay || 500;
@@ -163,6 +170,7 @@ class DropdownOrigin {
 
     this.htmlElem = _htmlElem;
     this.menuElem = _htmlElem.querySelector(".dropdown");
+    console.log(this.itemElem);
   }
 
   appendSubmenuArrow(_htmlElem) {
@@ -268,7 +276,7 @@ class DropdownOrigin {
 
   attachHoverListener(_htmlElem) {
     _htmlElem.addEventListener("mouseenter", () => {
-      if (_htmlElem.getAttribute("enabled") !== "false") {
+      if (this.itemElem.getAttribute("enabled") !== "false") {
         _htmlElem.classList.add("highlighted");
         this.menuOpenTimeout = setTimeout(() => {
           _htmlElem.classList.add("opened");
@@ -283,7 +291,7 @@ class DropdownOrigin {
 
   attachClickListener(_htmlElem) {
     _htmlElem.addEventListener("click", (_event) => {
-      if (_htmlElem.getAttribute("enabled") !== "false") {
+      if (this.itemElem.getAttribute("enabled") !== "false") {
         const underMouse = document.elementsFromPoint(
           _event.clientX,
           _event.clientY
@@ -309,7 +317,7 @@ class DropdownOrigin {
 
   attachMouseLeaveListener(_htmlElem) {
     _htmlElem.addEventListener("mouseleave", (_event) => {
-      if (_htmlElem.getAttribute("enabled") !== "false") {
+      if (this.itemElem.getAttribute("enabled") !== "false") {
         clearTimeout(this.menuOpenTimeout);
 
         const underMouse = document.elementsFromPoint(
@@ -331,3 +339,7 @@ class DropdownOrigin {
 }
 
 new DropdownBar(document.querySelector(".dropdown-bar"));
+const saveItem = document.querySelector(".save");
+saveItem.addEventListener("click", () => {
+  console.log(saveItem);
+});
