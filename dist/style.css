@@ -34,6 +34,9 @@ body {
   flex-direction: column;
 }
 
+/* If a styling element is included as a varible, edit the variable rather than
+editing the property directly, because the value may be used in multiple 
+places. */
 .dropdown-anchor {
   --dropdown-vert-margin: 0.2em;
   --dropdown-horiz-margin: 1.2em;
@@ -59,6 +62,10 @@ body {
 
   --dropdown-icon-size: 1.1em;
 
+  --dropdown-cursor-enabled: default;
+  --dropdown-cursor-disabled: default;
+  --dropdown-cursor-enabled-link: default;
+
   background-color: var(--dropdown-anchor-bg-color);
   padding: 0px;
   margin: 0px;
@@ -72,7 +79,7 @@ body {
   width: fit-content;
   position: relative;
   font-family: Arial, Helvetica, sans-serif;
-  cursor: default;
+  cursor: var(--dropdown-cursor-enabled);
 }
 
 .dropdown-anchor > div:first-child {
@@ -117,12 +124,14 @@ body {
 .dropdown ul > div:first-child[enabled="false"],
 .dropdown-anchor > div:first-child[enabled="false"] {
   color: var(--dropdown-disabled-font-color);
+  cursor: var(--dropdown-cursor-disabled);
 }
 
 .dropdown ul > div:first-child ~ a {
   grid-area: 1 / 1 / 2 / 2;
   height: 100%;
   width: 100%;
+  cursor: var(--dropdown-cursor-enabled-link);
 }
 
 .dropdown ul > div:first-child[enabled="false"] ~ a {
