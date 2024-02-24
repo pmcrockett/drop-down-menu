@@ -1,3 +1,63 @@
+@keyframes appear {
+  0% {
+    position: absolute;
+    opacity: 0;
+    transform: scale(0, 0);
+    display: none;
+  }
+
+  100% {
+    position: absolute;
+    display: block;
+    opacity: 1;
+    transform: scale(1, 1);
+  }
+}
+
+@keyframes disappear {
+  0% {
+    position: absolute;
+    display: block;
+    opacity: 1;
+    transform: scale(1, 1);
+  }
+
+  100% {
+    position: absolute;
+    opacity: 0;
+    transform: scale(0, 0);
+    display: none;
+  }
+}
+
+@keyframes highlight-appear {
+  0% {
+    background-color: var(--dropdown-anim-bg-color-start);
+    fill: var(--dropdown-anim-font-color-start);
+    color: var(--dropdown-anim-font-color-start);
+  }
+
+  100% {
+    background-color: var(--dropdown-anim-bg-color-end);
+    fill: var(--dropdown-anim-font-color-end);
+    color: var(--dropdown-anim-font-color-end);
+  }
+}
+
+@keyframes highlight-disappear {
+  0% {
+    background-color: var(--dropdown-anim-bg-color-end);
+    fill: var(--dropdown-anim-font-color-end);
+    color: var(--dropdown-anim-font-color-end);
+  }
+
+  100% {
+    background-color: var(--dropdown-anim-bg-color-start);
+    fill: var(--dropdown-anim-font-color-start);
+    color: var(--dropdown-anim-font-color-start);
+  }
+}
+
 /* @font-face {
   font-family: Custom-Font;
   src: url(./FONT_NAME.ttf);
@@ -43,7 +103,7 @@ places. */
   --dropdown-border-width: 1px;
 
   --dropdown-font-color: rgb(65, 53, 38);
-  --dropdown-disabled-font-color: rgb(177, 147, 107);
+  --dropdown-font-disabled-color: rgb(177, 147, 107);
   --dropdown-font-highlight-color: antiquewhite;
   --dropdown-font-size: 14px;
 
@@ -65,6 +125,11 @@ places. */
   --dropdown-cursor-enabled: default;
   --dropdown-cursor-disabled: default;
   --dropdown-cursor-enabled-link: default;
+
+  --dropdown-anim-pop-in-speed: 0.2s;
+  --dropdown-anim-pop-out-speed: 0.4s;
+  --dropdown-anim-highlight-in-speed: 0.1s;
+  --dropdown-anim-highlight-out-speed: 0.4s;
 
   background-color: var(--dropdown-anchor-bg-color);
   padding: 0px;
@@ -123,7 +188,7 @@ places. */
 
 .dropdown ul > div:first-child[enabled="false"],
 .dropdown-anchor > div:first-child[enabled="false"] {
-  color: var(--dropdown-disabled-font-color);
+  color: var(--dropdown-font-disabled-color);
   cursor: var(--dropdown-cursor-disabled);
 }
 
@@ -188,7 +253,7 @@ places. */
 }
 
 .dropdown-right {
-  color: var(--dropdown-disabled-font-color);
+  color: var(--dropdown-font-disabled-color);
   grid-area: 1 / -1 / 2 / -2;
   padding-left: 2em;
 }
@@ -210,45 +275,90 @@ places. */
 }
 
 .dropdown ul > div:first-child[enabled="false"] ~ .dropdown-expand-img {
-  fill: var(--dropdown-disabled-font-color);
+  fill: var(--dropdown-font-disabled-color);
 }
 
 .dropdown
-  ul:not(.dropdown-spacer)
-  > div:first-child:not([enabled="false"]):hover,
+  ul:not(.dropdown-spacer):hover
+  > div:first-child:not([enabled="false"]),
 .dropdown-anchor.highlighted > div:first-child:not([enabled="false"]),
 .dropdown-expand.highlighted {
   color: var(--dropdown-font-highlight-color);
   background-color: var(--dropdown-highlight-color);
+  --dropdown-anim-bg-color-start: rgba(0, 0, 0, 0);
+  --dropdown-anim-font-color-start: var(--dropdown-font-color);
+  --dropdown-anim-bg-color-end: var(--dropdown-highlight-color);
+  --dropdown-anim-font-color-end: var(--dropdown-font-highlight-color);
+  animation: var(--dropdown-anim-highlight-in-speed) highlight-appear;
+}
+
+.dropdown-anchor.highlighted > div:first-child:not([enabled="false"]) {
+  --dropdown-anim-bg-color-start: var(--dropdown-anchor-hover-color);
 }
 
 .dropdown
-  ul:not(.dropdown-spacer)
-  > div:not([enabled="false"]):hover
+  ul:not(.dropdown-spacer):hover
+  > div:not([enabled="false"])
   > .dropdown-right,
 .dropdown-anchor.highlighted > div > .dropdown-right,
 .dropdown-expand.highlighted > div > .dropdown-right {
   color: var(--dropdown-font-highlight-color);
+  --dropdown-anim-bg-color-start: rgba(0, 0, 0, 0);
+  --dropdown-anim-font-color-start: var(--dropdown-font-disabled-color);
+  --dropdown-anim-bg-color-end: rgba(0, 0, 0, 0);
+  --dropdown-anim-font-color-end: var(--dropdown-font-highlight-color);
+  animation: var(--dropdown-anim-highlight-in-speed) highlight-appear;
 }
 
 .dropdown
-  ul:not(.dropdown-spacer)
-  > div:first-child:not([enabled="false"]):hover
+  ul:not(.dropdown-spacer):hover
+  > div:first-child:not([enabled="false"])
   ~ .dropdown-expand-img,
 .dropdown-anchor.highlighted > .dropdown-expand-img,
 .dropdown-expand.highlighted > .dropdown-expand-img {
   fill: var(--dropdown-font-highlight-color);
+  --dropdown-anim-bg-color-start: rgba(0, 0, 0, 0);
+  --dropdown-anim-font-color-start: var(--dropdown-font-color);
+  --dropdown-anim-bg-color-end: rgba(0, 0, 0, 0);
+  --dropdown-anim-font-color-end: var(--dropdown-font-highlight-color);
+  animation: var(--dropdown-anim-highlight-in-speed) highlight-appear;
+}
+
+.mouseover {
+  --dropdown-anim-bg-color-start: rgba(0, 0, 0, 0);
+  --dropdown-anim-font-color-start: var(--dropdown-font-color);
+  --dropdown-anim-bg-color-end: var(--dropdown-highlight-color);
+  --dropdown-anim-font-color-end: var(--dropdown-font-highlight-color);
+  animation: var(--dropdown-anim-highlight-out-speed) highlight-disappear;
+}
+
+.mouseover > .dropdown-right {
+  --dropdown-anim-bg-color-start: rgba(0, 0, 0, 0);
+  --dropdown-anim-font-color-start: var(--dropdown-font-disabled-color);
+  --dropdown-anim-bg-color-end: rgba(0, 0, 0, 0);
+  --dropdown-anim-font-color-end: var(--dropdown-font-highlight-color);
+  animation: var(--dropdown-anim-highlight-out-speed) highlight-disappear;
+}
+
+.mouseover ~ .dropdown-expand-img {
+  --dropdown-anim-bg-color-start: rgba(0, 0, 0, 0);
+  --dropdown-anim-font-color-start: var(--dropdown-font-color);
+  --dropdown-anim-bg-color-end: rgba(0, 0, 0, 0);
+  --dropdown-anim-font-color-end: var(--dropdown-font-highlight-color);
+  animation: var(--dropdown-anim-highlight-out-speed) highlight-disappear;
 }
 
 .dropdown-anchor > .dropdown,
 .dropdown-expand > .dropdown {
   display: none;
+  animation: var(--dropdown-anim-pop-out-speed) disappear;
 }
 
 .dropdown-anchor.opened > .dropdown,
 .dropdown-expand.opened > .dropdown {
   display: block;
   position: absolute;
+  animation: var(--dropdown-anim-pop-in-speed) appear;
 }
 
 .hidden {

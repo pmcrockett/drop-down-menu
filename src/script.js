@@ -35,9 +35,8 @@ class DropdownBar {
         });
 
         if (needMenuOpen) {
-          _dropdown.origins[0].htmlElem.classList.add("opened");
+          _dropdown.origins[0].openDropdown();
           _dropdown.origins[0].htmlElem.classList.add("highlighted");
-          _dropdown.origins[0].repositionOffscreenMenu();
         }
       }
     });
@@ -139,25 +138,41 @@ class DropdownOrigin {
   htmlElem;
   menuElem;
   itemElem;
+  menuItemUls = [];
+  menuItemDivs = [];
   menuOpenTimeout;
   menuCloseTimeout;
   hoverDelay;
   popDirection;
 
   constructor(_htmlElem, _hoverDelay) {
+    this.htmlElem = _htmlElem;
+    this.menuElem = _htmlElem.querySelector(".dropdown");
+    this.menuItemUls.push(this.menuElem.querySelector("ul"));
+    let nextUl = this.menuItemUls[0].nextSibling;
+
+    while (nextUl) {
+      if (
+        nextUl.nodeType === 1 &&
+        !nextUl.classList.contains("dropdown-spacer")
+      ) {
+        this.menuItemUls.push(nextUl);
+      }
+
+      nextUl = nextUl.nextSibling;
+    }
+
     if (!_htmlElem.classList.contains("dropdown-anchor")) {
       this.appendSubmenuArrow(_htmlElem);
       this.popDirection =
         _htmlElem.getAttribute("popdirection") || "right-down";
-      this.itemElem =
-        _htmlElem.querySelector("ul > div:first-child") ||
-        _htmlElem.querySelector("ul > a:first-child");
+      this.itemElem = _htmlElem.querySelector("ul > div:first-child");
     } else {
       this.popDirection =
         _htmlElem.getAttribute("popdirection") || "down-right";
-      this.itemElem =
-        _htmlElem.querySelector(".dropdown-anchor > div:first-child") ||
-        _htmlElem.querySelector(".dropdown-anchor > a:first-child");
+      this.itemElem = _htmlElem.querySelector(
+        ".dropdown-anchor > div:first-child"
+      );
     }
 
     this.hoverDelay = _hoverDelay || 500;
@@ -167,10 +182,6 @@ class DropdownOrigin {
     } else {
       this.attachHoverListener(_htmlElem);
     }
-
-    this.htmlElem = _htmlElem;
-    this.menuElem = _htmlElem.querySelector(".dropdown");
-    console.log(this.itemElem);
   }
 
   appendSubmenuArrow(_htmlElem) {
@@ -190,6 +201,7 @@ class DropdownOrigin {
         this.menuElem.style.left =
           "calc(var(--dropdown-anchor-border-width-horiz) * -1)";
         this.menuElem.style.top = "100%";
+        this.menuElem.style["transform-origin"] = "top left";
       } else if (
         this.popDirection === "right" ||
         this.popDirection === "right-down"
@@ -197,6 +209,7 @@ class DropdownOrigin {
         this.menuElem.style.left = "100%";
         this.menuElem.style.top =
           "calc(var(--dropdown-anchor-border-width-vert) * -1)";
+        this.menuElem.style["transform-origin"] = "top left";
       } else if (
         this.popDirection === "left" ||
         this.popDirection === "left-down"
@@ -204,6 +217,7 @@ class DropdownOrigin {
         this.menuElem.style.right = "100%";
         this.menuElem.style.top =
           "calc(var(--dropdown-anchor-border-width-vert) * -1)";
+        this.menuElem.style["transform-origin"] = "top right";
       } else if (
         this.popDirection === "up" ||
         this.popDirection === "up-right"
@@ -211,22 +225,27 @@ class DropdownOrigin {
         this.menuElem.style.left =
           "calc(var(--dropdown-anchor-border-width-horiz) * -1)";
         this.menuElem.style.bottom = "100%";
+        this.menuElem.style["transform-origin"] = "bottom left";
       } else if (this.popDirection === "down-left") {
         this.menuElem.style.right =
           "calc(var(--dropdown-anchor-border-width-horiz) * -1)";
         this.menuElem.style.top = "100%";
+        this.menuElem.style["transform-origin"] = "top right";
       } else if (this.popDirection === "right-up") {
         this.menuElem.style.left = "100%";
         this.menuElem.style.bottom =
           "calc(var(--dropdown-anchor-border-width-vert) * -1)";
+        this.menuElem.style["transform-origin"] = "bottom left";
       } else if (this.popDirection === "left-up") {
         this.menuElem.style.right = "100%";
         this.menuElem.style.bottom =
           "calc(var(--dropdown-anchor-border-width-vert) * -1)";
+        this.menuElem.style["transform-origin"] = "bottom right";
       } else if (this.popDirection === "up-left") {
         this.menuElem.style.right =
           "calc(var(--dropdown-anchor-border-width-horiz) * -1)";
         this.menuElem.style.bottom = "100%";
+        this.menuElem.style["transform-origin"] = "bottom right";
       }
       // Nested submenus.
     } else if (
@@ -235,18 +254,22 @@ class DropdownOrigin {
     ) {
       this.menuElem.style.left = "100%";
       this.menuElem.style.top = "calc(var(--dropdown-border-width) * -1)";
+      this.menuElem.style["transform-origin"] = "top left";
     } else if (
       this.popDirection === "left" ||
       this.popDirection === "left-down"
     ) {
       this.menuElem.style.right = "100%";
       this.menuElem.style.top = "calc(var(--dropdown-border-width) * -1)";
+      this.menuElem.style["transform-origin"] = "top right";
     } else if (this.popDirection === "right-up") {
       this.menuElem.style.left = "100%";
       this.menuElem.style.bottom = "calc(var(--dropdown-border-width) * -1)";
+      this.menuElem.style["transform-origin"] = "bottom left";
     } else if (this.popDirection === "left-up") {
       this.menuElem.style.right = "100%";
       this.menuElem.style.bottom = "calc(var(--dropdown-border-width) * -1)";
+      this.menuElem.style["transform-origin"] = "bottom right";
     }
 
     const vw = document.documentElement.clientWidth || window.innerWidth;
@@ -274,14 +297,23 @@ class DropdownOrigin {
     }
   }
 
+  openDropdown() {
+    this.htmlElem.classList.add("opened");
+    this.repositionOffscreenMenu();
+    this.menuItemDivs.forEach((_div) => {
+      _div.classList.remove("mouseover");
+    });
+    // this.itemElem.classList.remove("mouseover");
+    this.itemElem.classList.add("mouseover");
+  }
+
   attachHoverListener(_htmlElem) {
     _htmlElem.addEventListener("mouseenter", () => {
       if (this.itemElem.getAttribute("enabled") !== "false") {
         _htmlElem.classList.add("highlighted");
         this.menuOpenTimeout = setTimeout(() => {
-          _htmlElem.classList.add("opened");
+          this.openDropdown();
           clearTimeout(this.menuCloseTimeout);
-          this.repositionOffscreenMenu();
         }, this.hoverDelay);
       }
     });
@@ -303,8 +335,7 @@ class DropdownOrigin {
             _htmlElem.classList.remove("opened");
           } else {
             _htmlElem.classList.add("highlighted");
-            _htmlElem.classList.add("opened");
-            this.repositionOffscreenMenu();
+            this.openDropdown();
           }
         }
 
@@ -335,11 +366,23 @@ class DropdownOrigin {
         }
       }
     });
+
+    for (const ul of this.menuItemUls) {
+      const menuItem = ul.querySelector("div:first-child");
+      this.menuItemDivs.push(menuItem);
+      ul.addEventListener("mouseleave", () => {
+        if (menuItem.getAttribute("enabled") !== "false") {
+          menuItem.classList.add("mouseover");
+        }
+      });
+    }
   }
 }
 
 new DropdownBar(document.querySelector(".dropdown-bar"));
 const saveItem = document.querySelector(".save");
 saveItem.addEventListener("click", () => {
-  console.log(saveItem);
+  if (saveItem.getAttribute("enabled") !== "false") {
+    console.log(saveItem);
+  }
 });
