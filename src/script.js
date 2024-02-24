@@ -21,22 +21,24 @@ class DropdownBar {
 
   attachHoverListener(_dropdown) {
     _dropdown.origins[0].htmlElem.addEventListener("mouseenter", () => {
-      let needMenuOpen = false;
+      if (_dropdown.origins[0].htmlElem.getAttribute("enabled") !== "false") {
+        let needMenuOpen = false;
 
-      this.dropdowns.forEach((_menu) => {
-        if (
-          _menu != _dropdown &&
-          _menu.origins[0].htmlElem.classList.contains("opened")
-        ) {
-          needMenuOpen = true;
-          _menu.closeHierarchy();
+        this.dropdowns.forEach((_menu) => {
+          if (
+            _menu != _dropdown &&
+            _menu.origins[0].htmlElem.classList.contains("opened")
+          ) {
+            needMenuOpen = true;
+            _menu.closeHierarchy();
+          }
+        });
+
+        if (needMenuOpen) {
+          _dropdown.origins[0].htmlElem.classList.add("opened");
+          _dropdown.origins[0].htmlElem.classList.add("highlighted");
+          _dropdown.origins[0].repositionOffscreenMenu();
         }
-      });
-
-      if (needMenuOpen) {
-        _dropdown.origins[0].htmlElem.classList.add("opened");
-        _dropdown.origins[0].htmlElem.classList.add("highlighted");
-        _dropdown.origins[0].repositionOffscreenMenu();
       }
     });
   }
@@ -57,7 +59,7 @@ class Dropdown {
 
     this.attachMouseEnterListener(_htmlMenu);
     this.attachClickListener(_htmlMenu);
-    this.attachReizeListener();
+    this.attachResizeListener();
   }
 
   closeHierarchy() {
@@ -117,7 +119,7 @@ class Dropdown {
   // We attach the resize listener to Dropdown instead of individual
   // DropdownOrigins to reduce the number of checks made on resize by closed
   // menus.
-  attachReizeListener() {
+  attachResizeListener() {
     window.addEventListener("resize", () => {
       if (this.origins[0].htmlElem.classList.contains("opened")) {
         this.origins[0].repositionOffscreenMenu();
@@ -139,10 +141,16 @@ class DropdownOrigin {
   menuOpenTimeout;
   menuCloseTimeout;
   hoverDelay;
+  popDirection;
 
   constructor(_htmlElem, _hoverDelay) {
     if (!_htmlElem.classList.contains("dropdown-anchor")) {
       this.appendSubmenuArrow(_htmlElem);
+      this.popDirection =
+        _htmlElem.getAttribute("popdirection") || "right-down";
+    } else {
+      this.popDirection =
+        _htmlElem.getAttribute("popdirection") || "down-right";
     }
 
     this.hoverDelay = _hoverDelay || 500;
@@ -166,20 +174,71 @@ class DropdownOrigin {
     _htmlElem.insertBefore(svg, menu);
   }
 
-  getMenuWidth() {
-    return window.getComputedStyle(this.menuElem).getPropertyValue("width");
-  }
-
   repositionOffscreenMenu() {
     // Ensure default position so we can check whether the menu is offscreen.
+    // Anchor menus.
     if (this.htmlElem.classList.contains("dropdown-anchor")) {
-      this.menuElem.style.left =
-        "calc(var(--dropdown-anchor-border-width-horiz) * -1)";
-      this.menuElem.style.top =
-        "calc(100% - var(--dropdown-anchor-border-width-vert))";
-    } else {
+      if (this.popDirection === "down" || this.popDirection === "down-right") {
+        this.menuElem.style.left =
+          "calc(var(--dropdown-anchor-border-width-horiz) * -1)";
+        this.menuElem.style.top = "100%";
+      } else if (
+        this.popDirection === "right" ||
+        this.popDirection === "right-down"
+      ) {
+        this.menuElem.style.left = "100%";
+        this.menuElem.style.top =
+          "calc(var(--dropdown-anchor-border-width-vert) * -1)";
+      } else if (
+        this.popDirection === "left" ||
+        this.popDirection === "left-down"
+      ) {
+        this.menuElem.style.right = "100%";
+        this.menuElem.style.top =
+          "calc(var(--dropdown-anchor-border-width-vert) * -1)";
+      } else if (
+        this.popDirection === "up" ||
+        this.popDirection === "up-right"
+      ) {
+        this.menuElem.style.left =
+          "calc(var(--dropdown-anchor-border-width-horiz) * -1)";
+        this.menuElem.style.bottom = "100%";
+      } else if (this.popDirection === "down-left") {
+        this.menuElem.style.right =
+          "calc(var(--dropdown-anchor-border-width-horiz) * -1)";
+        this.menuElem.style.top = "100%";
+      } else if (this.popDirection === "right-up") {
+        this.menuElem.style.left = "100%";
+        this.menuElem.style.bottom =
+          "calc(var(--dropdown-anchor-border-width-vert) * -1)";
+      } else if (this.popDirection === "left-up") {
+        this.menuElem.style.right = "100%";
+        this.menuElem.style.bottom =
+          "calc(var(--dropdown-anchor-border-width-vert) * -1)";
+      } else if (this.popDirection === "up-left") {
+        this.menuElem.style.right =
+          "calc(var(--dropdown-anchor-border-width-horiz) * -1)";
+        this.menuElem.style.bottom = "100%";
+      }
+      // Nested submenus.
+    } else if (
+      this.popDirection === "right" ||
+      this.popDirection === "right-down"
+    ) {
       this.menuElem.style.left = "100%";
       this.menuElem.style.top = "calc(var(--dropdown-border-width) * -1)";
+    } else if (
+      this.popDirection === "left" ||
+      this.popDirection === "left-down"
+    ) {
+      this.menuElem.style.right = "100%";
+      this.menuElem.style.top = "calc(var(--dropdown-border-width) * -1)";
+    } else if (this.popDirection === "right-up") {
+      this.menuElem.style.left = "100%";
+      this.menuElem.style.bottom = "calc(var(--dropdown-border-width) * -1)";
+    } else if (this.popDirection === "left-up") {
+      this.menuElem.style.right = "100%";
+      this.menuElem.style.bottom = "calc(var(--dropdown-border-width) * -1)";
     }
 
     const vw = document.documentElement.clientWidth || window.innerWidth;
@@ -209,12 +268,14 @@ class DropdownOrigin {
 
   attachHoverListener(_htmlElem) {
     _htmlElem.addEventListener("mouseenter", () => {
-      _htmlElem.classList.add("highlighted");
-      this.menuOpenTimeout = setTimeout(() => {
-        _htmlElem.classList.add("opened");
-        clearTimeout(this.menuCloseTimeout);
-        this.repositionOffscreenMenu();
-      }, this.hoverDelay);
+      if (_htmlElem.getAttribute("enabled") !== "false") {
+        _htmlElem.classList.add("highlighted");
+        this.menuOpenTimeout = setTimeout(() => {
+          _htmlElem.classList.add("opened");
+          clearTimeout(this.menuCloseTimeout);
+          this.repositionOffscreenMenu();
+        }, this.hoverDelay);
+      }
     });
 
     this.attachMouseLeaveListener(_htmlElem);
@@ -222,23 +283,25 @@ class DropdownOrigin {
 
   attachClickListener(_htmlElem) {
     _htmlElem.addEventListener("click", (_event) => {
-      const underMouse = document.elementsFromPoint(
-        _event.clientX,
-        _event.clientY
-      );
+      if (_htmlElem.getAttribute("enabled") !== "false") {
+        const underMouse = document.elementsFromPoint(
+          _event.clientX,
+          _event.clientY
+        );
 
-      if (dom.nodeListContainsElement(underMouse, _htmlElem)) {
-        if (_htmlElem.classList.contains("opened")) {
-          _htmlElem.classList.remove("highlighted");
-          _htmlElem.classList.remove("opened");
-        } else {
-          _htmlElem.classList.add("highlighted");
-          _htmlElem.classList.add("opened");
-          this.repositionOffscreenMenu();
+        if (dom.nodeListContainsElement(underMouse, _htmlElem)) {
+          if (_htmlElem.classList.contains("opened")) {
+            _htmlElem.classList.remove("highlighted");
+            _htmlElem.classList.remove("opened");
+          } else {
+            _htmlElem.classList.add("highlighted");
+            _htmlElem.classList.add("opened");
+            this.repositionOffscreenMenu();
+          }
         }
-      }
 
-      clearTimeout(this.menuCloseTimeout);
+        clearTimeout(this.menuCloseTimeout);
+      }
     });
 
     this.attachMouseLeaveListener(_htmlElem);
@@ -246,20 +309,22 @@ class DropdownOrigin {
 
   attachMouseLeaveListener(_htmlElem) {
     _htmlElem.addEventListener("mouseleave", (_event) => {
-      clearTimeout(this.menuOpenTimeout);
+      if (_htmlElem.getAttribute("enabled") !== "false") {
+        clearTimeout(this.menuOpenTimeout);
 
-      const underMouse = document.elementsFromPoint(
-        _event.clientX,
-        _event.clientY
-      );
+        const underMouse = document.elementsFromPoint(
+          _event.clientX,
+          _event.clientY
+        );
 
-      if (dom.nodeListContainsClass(underMouse, "dropdown")) {
-        _htmlElem.classList.remove("highlighted");
-        this.menuCloseTimeout = setTimeout(() => {
-          if (!_htmlElem.classList.contains("highlighted")) {
-            _htmlElem.classList.remove("opened");
-          }
-        }, this.hoverDelay);
+        if (dom.nodeListContainsClass(underMouse, "dropdown")) {
+          _htmlElem.classList.remove("highlighted");
+          this.menuCloseTimeout = setTimeout(() => {
+            if (!_htmlElem.classList.contains("highlighted")) {
+              _htmlElem.classList.remove("opened");
+            }
+          }, this.hoverDelay);
+        }
       }
     });
   }
