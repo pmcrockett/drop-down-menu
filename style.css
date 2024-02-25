@@ -1,9 +1,9 @@
 @keyframes appear {
   0% {
     position: absolute;
+    display: none;
     opacity: 0;
     transform: scale(0, 0);
-    display: none;
   }
 
   100% {
@@ -24,9 +24,9 @@
 
   100% {
     position: absolute;
+    display: none;
     opacity: 0;
     transform: scale(0, 0);
-    display: none;
   }
 }
 
@@ -58,25 +58,6 @@
   }
 }
 
-/* @font-face {
-  font-family: Custom-Font;
-  src: url(./FONT_NAME.ttf);
-} */
-
-/* * {
-  margin: 0px;
-} */
-
-/* :root {
-  user-select: none;
-  font-family: Custom-Font, Arial, Helvetica, sans-serif;
-} */
-
-/* body {
-  width: 1800px;
-  height: 2500px;
-} */
-
 body {
   display: grid;
   justify-content: center;
@@ -84,33 +65,10 @@ body {
   height: 1000px;
 }
 
-.dropdown-bar {
-  display: flex;
-  position: relative;
-  margin: 0px;
-}
-
-.dropdown-bar[direction="vertical"] {
-  flex-direction: column;
-}
-
 /* If a styling element is included as a varible, edit the variable rather than
 editing the property directly, because the value may be used in multiple 
 places. */
 .dropdown-anchor {
-  --dropdown-vert-margin: 0.2em;
-  --dropdown-horiz-margin: 1.2em;
-  --dropdown-border-width: 1px;
-
-  --dropdown-font-color: rgb(65, 53, 38);
-  --dropdown-font-disabled-color: rgb(177, 147, 107);
-  --dropdown-font-highlight-color: antiquewhite;
-  --dropdown-font-size: 14px;
-
-  --dropdown-bg-color: antiquewhite;
-  --dropdown-border-color: burlywood;
-  --dropdown-highlight-color: darkolivegreen;
-
   --dropdown-anchor-padding-horiz: 6px;
   --dropdown-anchor-padding-vert: 4px;
   --dropdown-anchor-border-width-horiz: 0px;
@@ -119,6 +77,19 @@ places. */
   --dropdown-anchor-bg-color: antiquewhite;
   --dropdown-anchor-hover-color: burlywood;
   --dropdown-anchor-border-color: burlywood;
+
+  --dropdown-vert-margin: 0.2em;
+  --dropdown-horiz-margin: 1.2em;
+  --dropdown-border-width: 1px;
+
+  --dropdown-bg-color: antiquewhite;
+  --dropdown-border-color: burlywood;
+  --dropdown-highlight-color: darkolivegreen;
+
+  --dropdown-font-color: rgb(65, 53, 38);
+  --dropdown-font-disabled-color: rgb(177, 147, 107);
+  --dropdown-font-highlight-color: antiquewhite;
+  --dropdown-font-size: 14px;
 
   --dropdown-icon-size: 1.1em;
 
@@ -147,16 +118,31 @@ places. */
   cursor: var(--dropdown-cursor-enabled);
 }
 
+/* Throughout, "div:first-child" refers to the tag surrounding the menu item 
+content. "div:first-child" occurs either as a child of "button.dropdown-anchor"
+or as a child of "ul". */
 .dropdown-anchor > div:first-child {
   padding: var(--dropdown-anchor-padding-vert)
     var(--dropdown-anchor-padding-horiz) var(--dropdown-anchor-padding-vert)
     var(--dropdown-anchor-padding-horiz);
 }
 
+/* Show highlighted background if hovering over the dropdown anchor. */
 .dropdown-anchor:hover > div:first-child:not([enabled="false"]) {
   background-color: var(--dropdown-anchor-hover-color);
 }
 
+.dropdown-bar {
+  display: flex;
+  position: relative;
+  margin: 0px;
+}
+
+.dropdown-bar[direction="vertical"] {
+  flex-direction: column;
+}
+
+/* The <div> that contains the list of menu items. */
 .dropdown {
   margin: 0px;
   color: var(--dropdown-font-color);
@@ -186,12 +172,15 @@ places. */
   position: relative;
 }
 
+/* Show disabled font/cursor if menu item is disabled. */
 .dropdown ul > div:first-child[enabled="false"],
 .dropdown-anchor > div:first-child[enabled="false"] {
   color: var(--dropdown-font-disabled-color);
   cursor: var(--dropdown-cursor-disabled);
 }
 
+/* If an <a> tag is present in the menu item, stretch it over the entire menu 
+item so any click will trigger it. */
 .dropdown ul > div:first-child ~ a {
   grid-area: 1 / 1 / 2 / 2;
   height: 100%;
@@ -199,6 +188,8 @@ places. */
   cursor: var(--dropdown-cursor-enabled-link);
 }
 
+/* Hide the <a> tag, making it unclickable, if the menu item is disabled. The 
+<a> tag has no visible content, so hiding it has no visual effect. */
 .dropdown ul > div:first-child[enabled="false"] ~ a {
   display: none;
 }
@@ -220,6 +211,7 @@ places. */
   text-decoration: none;
 }
 
+/* Default styling for menu itme content. */
 .dropdown ul > div:first-child {
   color: inherit;
   grid-area: 1 / 1 / 2 / 2;
@@ -233,6 +225,7 @@ places. */
   cursor: inherit;
 }
 
+/* Container used if the menu item text includes an icon. */
 .dropdown-left {
   grid-area: 1 / 1 / 2 / 2;
   display: grid;
@@ -252,12 +245,14 @@ places. */
   width: var(--dropdown-icon-size);
 }
 
+/* Container used if the menu item includes shortcut text. */
 .dropdown-right {
   color: var(--dropdown-font-disabled-color);
   grid-area: 1 / -1 / 2 / -2;
   padding-left: 2em;
 }
 
+/* Submenu arrow. */
 .dropdown-expand-img {
   justify-self: end;
   height: 1.5em;
@@ -268,16 +263,19 @@ places. */
   right: -0.2em;
 }
 
+/* Mirrored arrow when the submenu opens on the left. */
 .dropdown-expand[popdirection^="left"] > .dropdown-expand-img {
   justify-self: start;
   left: -0.2em;
   transform: scale(-1, 1);
 }
 
+/* Disabled arrow. */
 .dropdown ul > div:first-child[enabled="false"] ~ .dropdown-expand-img {
   fill: var(--dropdown-font-disabled-color);
 }
 
+/* Highlighted menu item/anchor. */
 .dropdown
   ul:not(.dropdown-spacer):hover
   > div:first-child:not([enabled="false"]),
@@ -292,10 +290,12 @@ places. */
   animation: var(--dropdown-anim-highlight-in-speed) highlight-appear;
 }
 
+/* Slightly different fade in for highlight on the menu anchor. */
 .dropdown-anchor.highlighted > div:first-child:not([enabled="false"]) {
   --dropdown-anim-bg-color-start: var(--dropdown-anchor-hover-color);
 }
 
+/* Highlighted shortcut text. */
 .dropdown
   ul:not(.dropdown-spacer):hover
   > div:not([enabled="false"])
@@ -310,6 +310,7 @@ places. */
   animation: var(--dropdown-anim-highlight-in-speed) highlight-appear;
 }
 
+/* Highlighted submenu arrow. */
 .dropdown
   ul:not(.dropdown-spacer):hover
   > div:first-child:not([enabled="false"])
@@ -324,6 +325,10 @@ places. */
   animation: var(--dropdown-anim-highlight-in-speed) highlight-appear;
 }
 
+/* In order to avoid triggering the fadeout animation on initial creation by 
+simply applying the fadeout to the element's default state, a menu element gets 
+a ".mouseover" class when the mouse leaves it. This class causes the fadeout 
+animation to play once the highlight condition is no longer met. */
 .mouseover {
   --dropdown-anim-bg-color-start: rgba(0, 0, 0, 0);
   --dropdown-anim-font-color-start: var(--dropdown-font-color);
@@ -348,12 +353,14 @@ places. */
   animation: var(--dropdown-anim-highlight-out-speed) highlight-disappear;
 }
 
+/* Closed menu's hidden state. */
 .dropdown-anchor > .dropdown,
 .dropdown-expand > .dropdown {
   display: none;
   animation: var(--dropdown-anim-pop-out-speed) disappear;
 }
 
+/* Opened menu's visible state. */
 .dropdown-anchor.opened > .dropdown,
 .dropdown-expand.opened > .dropdown {
   display: block;
