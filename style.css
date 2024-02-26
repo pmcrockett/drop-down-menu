@@ -100,8 +100,8 @@ places. */
   --dropdown-cursor-disabled: default;
   --dropdown-cursor-enabled-link: default;
 
-  --dropdown-anim-pop-in-speed: 1s;
-  --dropdown-anim-pop-out-speed: 0.4s;
+  --dropdown-anim-pop-in-speed: 0.2s;
+  --dropdown-anim-pop-out-speed: 0.2s;
   --dropdown-anim-highlight-in-speed: 0.1s;
   --dropdown-anim-highlight-out-speed: 0.4s;
 
@@ -121,17 +121,17 @@ places. */
   cursor: var(--dropdown-cursor-enabled);
 }
 
-/* Throughout, "div:first-child" refers to the tag surrounding the menu item 
-content. "div:first-child" occurs either as a child of "button.dropdown-anchor"
-or as a child of "ul". */
-.dropdown-anchor > div:first-child {
+/* Throughout, "div:first-of-type" refers to the tag surrounding the menu item 
+content. "div:first-of-type" occurs either as a child of 
+"button.dropdown-anchor" or as a child of "ul". */
+.dropdown-anchor > div:first-of-type {
   padding: var(--dropdown-anchor-padding-vert)
     var(--dropdown-anchor-padding-horiz) var(--dropdown-anchor-padding-vert)
     var(--dropdown-anchor-padding-horiz);
 }
 
 /* Show highlighted background if hovering over the dropdown anchor. */
-.dropdown-anchor:hover > div:first-child:not([enabled="false"]) {
+.dropdown-anchor:hover > div:first-of-type:not([enabled="false"]) {
   background-color: var(--dropdown-anchor-hover-color);
 }
 
@@ -176,15 +176,15 @@ or as a child of "ul". */
 }
 
 /* Show disabled font/cursor if menu item is disabled. */
-.dropdown ul > div:first-child[enabled="false"],
-.dropdown-anchor > div:first-child[enabled="false"] {
+.dropdown ul > div:first-of-type[enabled="false"],
+.dropdown-anchor > div:first-of-type[enabled="false"] {
   color: var(--dropdown-font-disabled-color);
   cursor: var(--dropdown-cursor-disabled);
 }
 
 /* If an <a> tag is present in the menu item, stretch it over the entire menu 
 item so any click will trigger it. */
-.dropdown ul > div:first-child ~ a {
+.dropdown ul > div:first-of-type ~ a {
   grid-area: 1 / 1 / 2 / 2;
   height: 100%;
   width: 100%;
@@ -193,7 +193,7 @@ item so any click will trigger it. */
 
 /* Hide the <a> tag, making it unclickable, if the menu item is disabled. The 
 <a> tag has no visible content, so hiding it has no visual effect. */
-.dropdown ul > div:first-child[enabled="false"] ~ a {
+.dropdown ul > div:first-of-type[enabled="false"] ~ a {
   display: none;
 }
 
@@ -216,7 +216,7 @@ item so any click will trigger it. */
 }
 
 /* Default styling for menu item content. */
-.dropdown ul > div:first-child {
+.dropdown ul > div:first-of-type {
   color: inherit;
   grid-area: 1 / 1 / 2 / 2;
   display: grid;
@@ -275,15 +275,15 @@ item so any click will trigger it. */
 }
 
 /* Disabled arrow. */
-.dropdown ul > div:first-child[enabled="false"] ~ .dropdown-expand-img {
+.dropdown ul > div:first-of-type[enabled="false"] ~ .dropdown-expand-img {
   fill: var(--dropdown-font-disabled-color);
 }
 
 /* Highlighted menu item/anchor. */
 .dropdown
   ul:not(.dropdown-spacer):not(.highlighted):hover
-  > div:first-child:not([enabled="false"]),
-.dropdown-anchor.highlighted > div:first-child:not([enabled="false"]),
+  > div:first-of-type:not([enabled="false"]),
+.dropdown-anchor.highlighted > div:first-of-type:not([enabled="false"]),
 .dropdown-expand.highlighted {
   color: var(--dropdown-font-highlight-color);
   background-color: var(--dropdown-highlight-color);
@@ -295,7 +295,7 @@ item so any click will trigger it. */
 }
 
 /* Slightly different fade in for highlight on the menu anchor. */
-.dropdown-anchor.highlighted > div:first-child:not([enabled="false"]) {
+.dropdown-anchor.highlighted > div:first-of-type:not([enabled="false"]) {
   --dropdown-anim-bg-color-start: var(--dropdown-anchor-hover-color);
 }
 
@@ -317,7 +317,7 @@ item so any click will trigger it. */
 /* Highlighted submenu arrow. */
 .dropdown
   ul:not(.dropdown-spacer):not(.highlighted):hover
-  > div:first-child:not([enabled="false"])
+  > div:first-of-type:not([enabled="false"])
   ~ .dropdown-expand-img,
 .dropdown-anchor.highlighted > .dropdown-expand-img,
 .dropdown-expand.highlighted > .dropdown-expand-img {
