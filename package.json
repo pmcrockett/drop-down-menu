@@ -1,7 +1,7 @@
 {
-  "name": "PROJECT NAME",
+  "name": "os-like-dropdown",
   "version": "1.0.0",
-  "description": "PROJECT DESCRIPTION",
+  "description": "Implements dropdown menus in the style of an OS menu bar.",
   "type": "module",
   "main": "script.js",
   "scripts": {
@@ -19,6 +19,5 @@
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }

@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./style.css" />
     <script src="main.js" defer></script>
-    <!-- <link rel="icon" href="./ICON_NAME.ico" /> -->
-    <title>PROJECT TITLE</title>
+    <title>os-like-dropdown demo</title>
   </head>
   <body>
+    <div class="log-text" style="min-height: 64px"></div>
     <div class="dropdown-bar" direction="horizontal">
       <button
         class="dropdown-anchor"
@@ -19,30 +19,36 @@
         <div>File</div>
         <div class="dropdown">
           <ul>
-            <div class="open" closeonselect="true">
+            <div id="new" closeonselect="true">
+              New...
+              <div class="dropdown-right">Ctrl+N</div>
+            </div>
+          </ul>
+          <ul>
+            <div id="open" closeonselect="true">
               Open...
               <div class="dropdown-right">Ctrl+O</div>
             </div>
           </ul>
           <ul class="dropdown-expand" popdirection="right-bottom" onset="hover">
-            <div enabled="true">Open recent</div>
+            <div id="open-recent" enabled="true">Open recent</div>
             <div class="dropdown">
               <ul>
-                <div class="recent-0">
+                <div id="recent-0" closeonselect="true">
                   <div class="dropdown-left">
                     <img src="./image.svg" />another_cat_picture.jpg
                   </div>
                 </div>
               </ul>
               <ul>
-                <div class="recent-1">
+                <div id="recent-1" closeonselect="true">
                   <div class="dropdown-left">
                     <img src="./image.svg" />clown_fiasco.jpg
                   </div>
                 </div>
               </ul>
               <ul>
-                <div class="recent-2">
+                <div id="recent-2" closeonselect="true">
                   <div class="dropdown-left">
                     <img
                       src="./image.svg"
@@ -51,86 +57,24 @@
                   </div>
                 </div>
               </ul>
-              <ul class="dropdown-expand" popdirection="right-bottom">
-                <div enabled="true">Open recent</div>
-                <a href=""></a>
-                <div class="dropdown">
-                  <ul>
-                    <div class="recent-0">
-                      <div class="dropdown-left">
-                        <img src="./image.svg" />another_cat_picture.jpg
-                      </div>
-                    </div>
-                  </ul>
-                  <ul>
-                    <div class="recent-1">
-                      <div class="dropdown-left">
-                        <img src="./image.svg" />clown_fiasco.jpg
-                      </div>
-                    </div>
-                  </ul>
-                  <ul>
-                    <div class="recent-2">
-                      <div class="dropdown-left">
-                        <img
-                          src="./image.svg"
-                          height="16px"
-                        />this-is-not-a-pipe.jpg
-                      </div>
-                    </div>
-                  </ul>
-                  <ul class="dropdown-expand" popdirection="right-bottom">
-                    <div enabled="true">Open recent</div>
-                    <a href=""></a>
-                    <div class="dropdown">
-                      <ul>
-                        <div class="recent-0">
-                          <div class="dropdown-left">
-                            <img src="./image.svg" />another_cat_picture.jpg
-                          </div>
-                        </div>
-                      </ul>
-                      <ul>
-                        <div class="recent-1">
-                          <div class="dropdown-left">
-                            <img src="./image.svg" />clown_fiasco.jpg
-                          </div>
-                        </div>
-                      </ul>
-                      <ul>
-                        <div class="recent-2">
-                          <div class="dropdown-left">
-                            <img
-                              src="./image.svg"
-                              height="16px"
-                            />this-is-not-a-pipe.jpg
-                          </div>
-                        </div>
-                      </ul>
-                    </div>
-                  </ul>
-                </div>
-              </ul>
             </div>
           </ul>
           <ul class="dropdown-spacer"></ul>
           <ul>
-            <div class="save" enabled="false">
+            <div id="save" enabled="false" closeonselect="true">
               Save
               <div class="dropdown-right">Ctrl+S</div>
             </div>
-            <a href=""></a>
           </ul>
           <ul>
-            <div class="save-as">
+            <div id="save-as" enabled="false" closeonselect="true">
               Save as...
               <div class="dropdown-right">Ctrl+Shift+S</div>
             </div>
-            <a href=""></a>
           </ul>
           <ul class="dropdown-spacer"></ul>
           <ul>
-            <div class="exit">
+            <div id="exit" closeonselect="true">
               Exit
               <div class="dropdown-right">Ctrl+Q</div>
             </div>
@@ -146,22 +90,77 @@
         <div>Edit</div>
         <div class="dropdown">
           <ul>
-            <div class="copy">
+            <div id="copy" closeonselect="true">
               Copy
               <div class="dropdown-right">Ctrl+C</div>
             </div>
           </ul>
           <ul>
-            <div class="cut">
+            <div id="cut" closeonselect="true">
               Cut
               <div class="dropdown-right">Ctrl+X</div>
             </div>
           </ul>
-          <ul enabled="false">
-            <div class="paste">
+          <ul>
+            <div id="paste" closeonselect="true">
               Paste
               <div class="dropdown-right">Ctrl+V</div>
             </div>
+          </ul>
+        </div>
+      </button>
+      <button
+        class="dropdown-anchor"
+        onset="click"
+        hoverdelay="300"
+        popdirection="bottom-right"
+      >
+        <div>Select</div>
+        <div class="dropdown">
+          <ul>
+            <div id="select-all" closeonselect="true">
+              All
+              <div class="dropdown-right">Ctrl+A</div>
+            </div>
+          </ul>
+          <ul>
+            <div id="select-none" closeonselect="true">None</div>
+          </ul>
+          <ul>
+            <div id="select-invert" closeonselect="true">
+              Invert
+              <div class="dropdown-right">Ctrl+I</div>
+            </div>
+          </ul>
+          <ul>
+            <div id="select-by-color" closeonselect="true">By color</div>
+          </ul>
+        </div>
+      </button>
+      <button
+        class="dropdown-anchor"
+        onset="click"
+        hoverdelay="300"
+        popdirection="bottom-right"
+      >
+        <div>Help</div>
+        <div class="dropdown">
+          <ul class="dropdown-expand" popdirection="right-bottom" onset="hover">
+            <div id="documents" enabled="true">Documents</div>
+            <div class="dropdown">
+              <ul>
+                <div id="quick-help" closeonselect="true">
+                  Quick help...
+                  <div class="dropdown-right">Ctrl+H</div>
+                </div>
+              </ul>
+              <ul>
+                <div id="online-help" closeonselect="true">Online help...</div>
+              </ul>
+            </div>
+          </ul>
+          <ul>
+            <div id="about" closeonselect="true">About...</div>
           </ul>
         </div>
       </button>

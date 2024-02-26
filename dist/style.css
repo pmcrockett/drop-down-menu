@@ -58,13 +58,6 @@
   }
 }
 
-body {
-  display: grid;
-  justify-content: center;
-  align-content: center;
-  height: 1000px;
-}
-
 /* If a styling element is included as a varible, edit the variable rather than
 editing the property directly, because the value may be used in multiple 
 places. */
