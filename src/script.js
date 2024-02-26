@@ -1,8 +1,17 @@
-import * as dom from "./dom-utilities.js";
+import {
+  createSvg,
+  elementIsOrContainsElement,
+  nodeListContainsClass,
+  nodeListContainsElement,
+} from "./dom-utilities.js";
+
+const defaultHoverDelay = 500;
 
 class DropdownBar {
   dropdowns = [];
 
+  // _htmlBar is a <div class="dropdown-bar"> containing at least one button or
+  // div of class "dropdown-anchor".
   constructor(_htmlBar) {
     const htmlMenus = _htmlBar.querySelectorAll(".dropdown-anchor");
 
@@ -10,45 +19,65 @@ class DropdownBar {
       this.dropdowns.push(new Dropdown(_elem));
     });
 
-    this.attachHoverListeners();
+    this.attachMouseEnterListeners();
   }
 
-  attachHoverListeners() {
+  attachMouseEnterListeners() {
     this.dropdowns.forEach((_dropdown) => {
-      this.attachHoverListener(_dropdown);
+      this.attachMouseEnterListener(_dropdown);
     });
   }
 
-  attachHoverListener(_dropdown) {
-    _dropdown.origins[0].htmlElem.addEventListener("mouseenter", () => {
-      if (_dropdown.origins[0].htmlElem.getAttribute("enabled") !== "false") {
-        let needMenuOpen = false;
+  attachMouseEnterListener(_dropdown) {
+    const anchor = _dropdown.getAnchor();
 
-        this.dropdowns.forEach((_menu) => {
-          if (
-            _menu != _dropdown &&
-            _menu.origins[0].htmlElem.classList.contains("opened")
-          ) {
-            needMenuOpen = true;
-            _menu.closeHierarchy();
-          }
-        });
+    anchor.htmlElem.addEventListener("mouseenter", () => {
+      this.switchOpenedDropdowns(_dropdown);
+    });
+  }
 
-        if (needMenuOpen) {
-          _dropdown.origins[0].openDropdown();
-          _dropdown.origins[0].htmlElem.classList.add("highlighted");
-        }
+  switchOpenedDropdowns(_targetDropdown) {
+    const targetAnchor = _targetDropdown.getAnchor();
+
+    if (targetAnchor.isEnabled()) {
+      const needMenuOpen = this.closeOpenedDropdowns([_targetDropdown]);
+
+      if (needMenuOpen) {
+        targetAnchor.openDropdown();
+        targetAnchor.htmlElem.classList.add("highlighted");
+      }
+    }
+  }
+
+  closeOpenedDropdowns(_keepOpen) {
+    let numClosed = 0;
+
+    this.dropdowns.forEach((_menu) => {
+      if (
+        !_keepOpen.includes(_menu) &&
+        _menu.getAnchor().htmlElem.classList.contains("opened")
+      ) {
+        numClosed++;
+        _menu.closeHierarchy();
       }
     });
+
+    return numClosed;
   }
 }
 
 class Dropdown {
   origins = [];
   hoverDelay;
+  htmlMenu;
 
+  // _htmlMenu is a <div class="dropdown"> that contains at least one <ul> with
+  // menu item data.
   constructor(_htmlMenu) {
-    this.hoverDelay = _htmlMenu.getAttribute("hoverdelay") || 500;
+    this.htmlMenu = _htmlMenu;
+    this.hoverDelay = _htmlMenu.getAttribute("hoverdelay") || defaultHoverDelay;
+
+    // The dropdown's anchor is always at this.origins[0].
     this.origins.push(new DropdownOrigin(_htmlMenu, this.hoverDelay));
     const suborigins = _htmlMenu.querySelectorAll(".dropdown-expand");
 
@@ -56,9 +85,13 @@ class Dropdown {
       this.origins.push(new DropdownOrigin(origin, this.hoverDelay));
     }
 
-    this.attachMouseEnterListener(_htmlMenu);
-    this.attachClickListener(_htmlMenu);
+    this.attachMouseEnterListener();
+    this.attachClickListener();
     this.attachResizeListener();
+  }
+
+  getAnchor() {
+    return this.origins[0];
   }
 
   closeHierarchy() {
@@ -68,30 +101,33 @@ class Dropdown {
     });
   }
 
-  // If we move the mouse back into the opened menu hierarchy, close any opened
-  // submenus that are no longer valid with the new mouse position.
-  attachMouseEnterListener(_htmlElem) {
-    _htmlElem.addEventListener("mouseenter", (_event) => {
-      const underMouse = document.elementsFromPoint(
-        _event.clientX,
-        _event.clientY
-      );
-      let menuUnderMouse;
+  closeDeeperThanMouse(_mouseX, _mouseY, _immediate) {
+    const underMouse = document.elementsFromPoint(_mouseX, _mouseY);
+    let menuUnderMouse;
 
-      for (const elem of underMouse) {
-        if (elem.classList.contains("dropdown")) {
-          menuUnderMouse = elem;
-          break;
-        }
+    // Find the actual HTML element for this dropdown. Can't just use
+    // _event.target because that gives us the anchor element, not the
+    // submenu element.
+    for (const elem of underMouse) {
+      if (elem.classList.contains("dropdown")) {
+        menuUnderMouse = elem;
+        break;
       }
+    }
 
-      if (!menuUnderMouse) return;
+    if (!menuUnderMouse) return;
 
-      const submenus = menuUnderMouse.querySelectorAll(
-        ".dropdown-expand, .dropdown-anchor"
-      );
+    const submenus = menuUnderMouse.querySelectorAll(
+      ".dropdown-expand, .dropdown-anchor"
+    );
 
-      for (const submenu of submenus) {
+    // Unhighlight/close any menus deeper than the menu the mouse moved into.
+    for (const submenu of submenus) {
+      if (_immediate) {
+        if (!submenu.classList.contains("highlighted")) {
+          submenu.classList.remove("opened");
+        }
+      } else {
         submenu.classList.remove("highlighted");
         submenu.menuCloseTimeout = setTimeout(() => {
           if (!submenu.classList.contains("highlighted")) {
@@ -99,19 +135,42 @@ class Dropdown {
           }
         }, this.hoverDelay);
       }
-    });
+    }
   }
 
   // Listen for clicks outside of the menu hierarchy and close the entire
   // hierarchy if one occurs.
-  attachClickListener(_htmlElem) {
-    document.addEventListener("click", (_event) => {
-      if (
-        _htmlElem.classList.contains("opened") &&
-        !dom.elementIsOrContainsElement(_htmlElem, _event.target)
-      ) {
-        this.closeHierarchy();
+  closeOnClickOutsideHierarchy(_clickTarget) {
+    if (
+      this.htmlMenu.classList.contains("opened") &&
+      !elementIsOrContainsElement(this.htmlMenu, _clickTarget)
+    ) {
+      this.closeHierarchy();
+    }
+  }
+
+  repositionOffscreenDropdowns() {
+    if (this.getAnchor().htmlElem.classList.contains("opened")) {
+      this.getAnchor().repositionOffscreenMenu();
+
+      for (let i = 1; i < this.origins.length; i++) {
+        if (this.origins[i].htmlElem.classList.contains("opened")) {
+          this.origins[i].repositionOffscreenMenu();
+        }
       }
+    }
+  }
+
+  attachMouseEnterListener() {
+    this.htmlMenu.addEventListener("mouseenter", (_event) => {
+      this.closeDeeperThanMouse(_event.clientX, _event.clientY, false);
+    });
+  }
+
+  attachClickListener() {
+    document.addEventListener("click", (_event) => {
+      this.closeOnClickOutsideHierarchy(_event.target);
+      this.closeDeeperThanMouse(_event.clientX, _event.clientY, true);
     });
   }
 
@@ -119,17 +178,10 @@ class Dropdown {
   // DropdownOrigins to reduce the number of checks made on resize by closed
   // menus.
   attachResizeListener() {
-    window.addEventListener("resize", () => {
-      if (this.origins[0].htmlElem.classList.contains("opened")) {
-        this.origins[0].repositionOffscreenMenu();
-
-        for (let i = 1; i < this.origins.length; i++) {
-          if (this.origins[i].htmlElem.classList.contains("opened")) {
-            this.origins[i].repositionOffscreenMenu();
-          }
-        }
-      }
-    });
+    window.addEventListener(
+      "resize",
+      this.repositionOffscreenDropdowns.bind(this)
+    );
   }
 }
 
@@ -138,139 +190,115 @@ class DropdownOrigin {
   htmlElem;
   menuElem;
   itemElem;
-  menuItemUls = [];
+  menuItemUls;
   menuItemDivs = [];
   menuOpenTimeout;
   menuCloseTimeout;
   hoverDelay;
   popDirection;
 
+  static positionOffsetValues = {
+    negativeAnchorHorizBorderOffset:
+      "calc(var(--dropdown-anchor-border-width-horiz) * -1)",
+    negativeAnchorVertBorderOffset:
+      "calc(var(--dropdown-anchor-border-width-vert) * -1)",
+    negativeBorderOffset: "calc(var(--dropdown-border-width) * -1)",
+    fullOffset: "100%",
+  };
+
+  static invertedDirections = {
+    top: "bottom",
+    bottom: "top",
+    right: "left",
+    left: "right",
+  };
+
   constructor(_htmlElem, _hoverDelay) {
     this.htmlElem = _htmlElem;
     this.menuElem = _htmlElem.querySelector(".dropdown");
-    this.menuItemUls.push(this.menuElem.querySelector("ul"));
-    let nextUl = this.menuItemUls[0].nextSibling;
+    this.menuItemUls = this.getAllUlsAtThisDropdownLevel();
+    let popDir;
+
+    if (!_htmlElem.classList.contains("dropdown-anchor")) {
+      popDir = _htmlElem.getAttribute("popdirection") || "right-bottom";
+      this.appendSubmenuArrow();
+      this.itemElem = _htmlElem.querySelector("ul > div:first-child");
+    } else {
+      popDir = _htmlElem.getAttribute("popdirection") || "bottom-rightt";
+      this.itemElem = _htmlElem.querySelector(
+        ".dropdown-anchor > div:first-child"
+      );
+    }
+
+    this.popDirection = popDir.split("-");
+    this.hoverDelay = _hoverDelay || defaultHoverDelay;
+
+    this.attachMouseEnterListener(_htmlElem.getAttribute("onset") !== "click");
+    this.attachClickListener();
+
+    this.attachMouseLeaveListeners();
+  }
+
+  getAllUlsAtThisDropdownLevel() {
+    const uls = [this.menuElem.querySelector("ul")];
+    let nextUl = uls[0].nextSibling;
 
     while (nextUl) {
       if (
         nextUl.nodeType === 1 &&
         !nextUl.classList.contains("dropdown-spacer")
       ) {
-        this.menuItemUls.push(nextUl);
+        uls.push(nextUl);
       }
 
       nextUl = nextUl.nextSibling;
     }
 
-    if (!_htmlElem.classList.contains("dropdown-anchor")) {
-      this.appendSubmenuArrow(_htmlElem);
-      this.popDirection =
-        _htmlElem.getAttribute("popdirection") || "right-down";
-      this.itemElem = _htmlElem.querySelector("ul > div:first-child");
-    } else {
-      this.popDirection =
-        _htmlElem.getAttribute("popdirection") || "down-right";
-      this.itemElem = _htmlElem.querySelector(
-        ".dropdown-anchor > div:first-child"
-      );
-    }
-
-    this.hoverDelay = _hoverDelay || 500;
-
-    if (_htmlElem.getAttribute("onset") === "click") {
-      this.attachClickListener(_htmlElem);
-    } else {
-      this.attachHoverListener(_htmlElem);
-    }
+    return uls;
   }
 
-  appendSubmenuArrow(_htmlElem) {
-    const menu = _htmlElem.querySelector(".dropdown");
+  appendSubmenuArrow() {
+    const menu = this.htmlElem.querySelector(".dropdown");
     if (!menu) return;
 
-    const svg = dom.createSvg("M10,17L15,12L10,7V17Z");
+    const svg = createSvg("M10,17L15,12L10,7V17Z");
     svg.classList.add("dropdown-expand-img");
-    _htmlElem.insertBefore(svg, menu);
+    this.htmlElem.insertBefore(svg, menu);
+  }
+
+  setMenuToDefaultPosition() {
+    let secondOffset;
+
+    // Offset in the first direction does not correct for border width; offset
+    // in the second direction does. An anchor may have separate horizontal and
+    // vertical border widths.
+    if (this.htmlElem.classList.contains("dropdown-anchor")) {
+      if (this.popDirection[1] === "right" || this.popDirection[1] === "left") {
+        secondOffset =
+          DropdownOrigin.positionOffsetValues.negativeAnchorHorizBorderOffset;
+      } else {
+        secondOffset =
+          DropdownOrigin.positionOffsetValues.negativeAnchorVertBorderOffset;
+      }
+    } else {
+      secondOffset = DropdownOrigin.positionOffsetValues.negativeBorderOffset;
+    }
+
+    const invDir = [
+      DropdownOrigin.invertedDirections[this.popDirection[0]],
+      DropdownOrigin.invertedDirections[this.popDirection[1]],
+    ];
+
+    this.menuElem.style[this.popDirection[0]] = "";
+    this.menuElem.style[invDir[0]] =
+      DropdownOrigin.positionOffsetValues.fullOffset;
+    this.menuElem.style[this.popDirection[1]] = "";
+    this.menuElem.style[invDir[1]] = secondOffset;
+    this.menuElem.style["transform-origin"] = `${invDir[0]} ${invDir[1]}`;
   }
 
   repositionOffscreenMenu() {
-    // Ensure default position so we can check whether the menu is offscreen.
-    // Anchor menus.
-    if (this.htmlElem.classList.contains("dropdown-anchor")) {
-      if (this.popDirection === "down" || this.popDirection === "down-right") {
-        this.menuElem.style.left =
-          "calc(var(--dropdown-anchor-border-width-horiz) * -1)";
-        this.menuElem.style.top = "100%";
-        this.menuElem.style["transform-origin"] = "top left";
-      } else if (
-        this.popDirection === "right" ||
-        this.popDirection === "right-down"
-      ) {
-        this.menuElem.style.left = "100%";
-        this.menuElem.style.top =
-          "calc(var(--dropdown-anchor-border-width-vert) * -1)";
-        this.menuElem.style["transform-origin"] = "top left";
-      } else if (
-        this.popDirection === "left" ||
-        this.popDirection === "left-down"
-      ) {
-        this.menuElem.style.right = "100%";
-        this.menuElem.style.top =
-          "calc(var(--dropdown-anchor-border-width-vert) * -1)";
-        this.menuElem.style["transform-origin"] = "top right";
-      } else if (
-        this.popDirection === "up" ||
-        this.popDirection === "up-right"
-      ) {
-        this.menuElem.style.left =
-          "calc(var(--dropdown-anchor-border-width-horiz) * -1)";
-        this.menuElem.style.bottom = "100%";
-        this.menuElem.style["transform-origin"] = "bottom left";
-      } else if (this.popDirection === "down-left") {
-        this.menuElem.style.right =
-          "calc(var(--dropdown-anchor-border-width-horiz) * -1)";
-        this.menuElem.style.top = "100%";
-        this.menuElem.style["transform-origin"] = "top right";
-      } else if (this.popDirection === "right-up") {
-        this.menuElem.style.left = "100%";
-        this.menuElem.style.bottom =
-          "calc(var(--dropdown-anchor-border-width-vert) * -1)";
-        this.menuElem.style["transform-origin"] = "bottom left";
-      } else if (this.popDirection === "left-up") {
-        this.menuElem.style.right = "100%";
-        this.menuElem.style.bottom =
-          "calc(var(--dropdown-anchor-border-width-vert) * -1)";
-        this.menuElem.style["transform-origin"] = "bottom right";
-      } else if (this.popDirection === "up-left") {
-        this.menuElem.style.right =
-          "calc(var(--dropdown-anchor-border-width-horiz) * -1)";
-        this.menuElem.style.bottom = "100%";
-        this.menuElem.style["transform-origin"] = "bottom right";
-      }
-      // Nested submenus.
-    } else if (
-      this.popDirection === "right" ||
-      this.popDirection === "right-down"
-    ) {
-      this.menuElem.style.left = "100%";
-      this.menuElem.style.top = "calc(var(--dropdown-border-width) * -1)";
-      this.menuElem.style["transform-origin"] = "top left";
-    } else if (
-      this.popDirection === "left" ||
-      this.popDirection === "left-down"
-    ) {
-      this.menuElem.style.right = "100%";
-      this.menuElem.style.top = "calc(var(--dropdown-border-width) * -1)";
-      this.menuElem.style["transform-origin"] = "top right";
-    } else if (this.popDirection === "right-up") {
-      this.menuElem.style.left = "100%";
-      this.menuElem.style.bottom = "calc(var(--dropdown-border-width) * -1)";
-      this.menuElem.style["transform-origin"] = "bottom left";
-    } else if (this.popDirection === "left-up") {
-      this.menuElem.style.right = "100%";
-      this.menuElem.style.bottom = "calc(var(--dropdown-border-width) * -1)";
-      this.menuElem.style["transform-origin"] = "bottom right";
-    }
+    this.setMenuToDefaultPosition();
 
     const vw = document.documentElement.clientWidth || window.innerWidth;
     const vh = document.documentElement.clientHeight || window.innerHeight;
@@ -297,83 +325,119 @@ class DropdownOrigin {
     }
   }
 
+  isEnabled() {
+    return this.itemElem.getAttribute("enabled") !== "false";
+  }
+
   openDropdown() {
     this.htmlElem.classList.add("opened");
+
+    // TODO: Check for offscreen position after pop-in animation finishes.
+    // Currently if the animation starts fully on screen, the menu won't get
+    // repositioned even if it ends up offscreen after the animation ends.
     this.repositionOffscreenMenu();
+
     this.menuItemDivs.forEach((_div) => {
       _div.classList.remove("mouseover");
     });
-    // this.itemElem.classList.remove("mouseover");
+
     this.itemElem.classList.add("mouseover");
   }
 
-  attachHoverListener(_htmlElem) {
-    _htmlElem.addEventListener("mouseenter", () => {
-      if (this.itemElem.getAttribute("enabled") !== "false") {
-        _htmlElem.classList.add("highlighted");
-        this.menuOpenTimeout = setTimeout(() => {
+  scheduleOpenMenu() {
+    if (this.isEnabled()) {
+      this.htmlElem.classList.add("highlighted");
+      this.menuOpenTimeout = setTimeout(() => {
+        if (!this.htmlElem.classList.contains("opened")) {
           this.openDropdown();
           clearTimeout(this.menuCloseTimeout);
+        }
+      }, this.hoverDelay);
+    }
+  }
+
+  scheduleCloseMenu(_mouseX, _mouseY) {
+    if (this.isEnabled()) {
+      clearTimeout(this.menuOpenTimeout);
+
+      const underMouse = document.elementsFromPoint(_mouseX, _mouseY);
+
+      if (nodeListContainsClass(underMouse, "dropdown")) {
+        this.htmlElem.classList.remove("highlighted");
+        this.menuCloseTimeout = setTimeout(() => {
+          if (!this.htmlElem.classList.contains("highlighted")) {
+            this.htmlElem.classList.remove("opened");
+          }
         }, this.hoverDelay);
       }
-    });
-
-    this.attachMouseLeaveListener(_htmlElem);
+    }
   }
 
-  attachClickListener(_htmlElem) {
-    _htmlElem.addEventListener("click", (_event) => {
-      if (this.itemElem.getAttribute("enabled") !== "false") {
-        const underMouse = document.elementsFromPoint(
-          _event.clientX,
-          _event.clientY
-        );
+  toggleOpenMenu(_mouseX, _mouseY) {
+    if (this.isEnabled()) {
+      const underMouse = document.elementsFromPoint(_mouseX, _mouseY);
 
-        if (dom.nodeListContainsElement(underMouse, _htmlElem)) {
-          if (_htmlElem.classList.contains("opened")) {
-            _htmlElem.classList.remove("highlighted");
-            _htmlElem.classList.remove("opened");
-          } else {
-            _htmlElem.classList.add("highlighted");
-            this.openDropdown();
+      if (nodeListContainsElement(underMouse, this.htmlElem)) {
+        if (this.htmlElem.classList.contains("opened")) {
+          this.htmlElem.classList.remove("opened");
+          clearTimeout(this.menuOpenTimeout);
+        } else {
+          this.htmlElem.classList.add("highlighted");
+          this.openDropdown();
+        }
+      }
+
+      clearTimeout(this.menuCloseTimeout);
+    }
+  }
+
+  addMouseoverClass(_menuItem) {
+    if (_menuItem.getAttribute("enabled") !== "false") {
+      _menuItem.classList.add("mouseover");
+    }
+  }
+
+  // TODO: Remove
+  removeAllHighlights(_mouseX, _mouseY) {
+    if (this.htmlElem.classList.contains("opened")) {
+      const underMouse = document.elementsFromPoint(_mouseX, _mouseY);
+
+      if (nodeListContainsElement(underMouse, this.menuElem)) {
+        for (const ul of this.menuItemUls) {
+          if (!nodeListContainsElement(underMouse, ul)) {
+            ul.classList.remove("highlighted");
           }
         }
-
-        clearTimeout(this.menuCloseTimeout);
       }
-    });
-
-    this.attachMouseLeaveListener(_htmlElem);
+    }
   }
 
-  attachMouseLeaveListener(_htmlElem) {
-    _htmlElem.addEventListener("mouseleave", (_event) => {
-      if (this.itemElem.getAttribute("enabled") !== "false") {
-        clearTimeout(this.menuOpenTimeout);
+  attachMouseEnterListener(_openOnHover) {
+    this.htmlElem.addEventListener("mouseenter", () => {
+      //this.removeAllHighlights(_event.clientX, _event.clientY);
 
-        const underMouse = document.elementsFromPoint(
-          _event.clientX,
-          _event.clientY
-        );
-
-        if (dom.nodeListContainsClass(underMouse, "dropdown")) {
-          _htmlElem.classList.remove("highlighted");
-          this.menuCloseTimeout = setTimeout(() => {
-            if (!_htmlElem.classList.contains("highlighted")) {
-              _htmlElem.classList.remove("opened");
-            }
-          }, this.hoverDelay);
-        }
+      if (_openOnHover) {
+        this.scheduleOpenMenu();
       }
+    });
+  }
+
+  attachClickListener() {
+    this.htmlElem.addEventListener("click", (_event) => {
+      this.toggleOpenMenu(_event.clientX, _event.clientY);
+    });
+  }
+
+  attachMouseLeaveListeners() {
+    this.htmlElem.addEventListener("mouseleave", (_event) => {
+      this.scheduleCloseMenu(_event.clientX, _event.clientY);
     });
 
     for (const ul of this.menuItemUls) {
       const menuItem = ul.querySelector("div:first-child");
       this.menuItemDivs.push(menuItem);
       ul.addEventListener("mouseleave", () => {
-        if (menuItem.getAttribute("enabled") !== "false") {
-          menuItem.classList.add("mouseover");
-        }
+        this.addMouseoverClass(menuItem);
       });
     }
   }
