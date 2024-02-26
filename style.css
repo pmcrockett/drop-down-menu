@@ -82,6 +82,9 @@ places. */
   --dropdown-horiz-margin: 1.2em;
   --dropdown-border-width: 1px;
 
+  --dropdown-spacer-thickness: 1px;
+  --dropdown-spacer-side-margin: 1em;
+
   --dropdown-bg-color: antiquewhite;
   --dropdown-border-color: burlywood;
   --dropdown-highlight-color: darkolivegreen;
@@ -196,9 +199,10 @@ item so any click will trigger it. */
 
 .dropdown .dropdown-spacer {
   background-color: var(--dropdown-border-color);
-  height: var(--dropdown-border-width);
-  margin: calc(0.1em + var(--dropdown-vert-margin)) 1em
-    calc(0.1em + var(--dropdown-vert-margin)) 1em;
+  height: var(--dropdown-spacer-thickness);
+  margin: calc(0.1em + var(--dropdown-vert-margin))
+    var(--dropdown-spacer-side-margin) calc(0.1em + var(--dropdown-vert-margin))
+    var(--dropdown-spacer-side-margin);
   padding: 0px;
   width: auto;
 }
@@ -211,7 +215,7 @@ item so any click will trigger it. */
   text-decoration: none;
 }
 
-/* Default styling for menu itme content. */
+/* Default styling for menu item content. */
 .dropdown ul > div:first-child {
   color: inherit;
   grid-area: 1 / 1 / 2 / 2;
@@ -277,7 +281,7 @@ item so any click will trigger it. */
 
 /* Highlighted menu item/anchor. */
 .dropdown
-  ul:not(.dropdown-spacer):hover
+  ul:not(.dropdown-spacer):not(.highlighted):hover
   > div:first-child:not([enabled="false"]),
 .dropdown-anchor.highlighted > div:first-child:not([enabled="false"]),
 .dropdown-expand.highlighted {
@@ -297,7 +301,7 @@ item so any click will trigger it. */
 
 /* Highlighted shortcut text. */
 .dropdown
-  ul:not(.dropdown-spacer):hover
+  ul:not(.dropdown-spacer):not(.highlighted):hover
   > div:not([enabled="false"])
   > .dropdown-right,
 .dropdown-anchor.highlighted > div > .dropdown-right,
@@ -312,7 +316,7 @@ item so any click will trigger it. */
 
 /* Highlighted submenu arrow. */
 .dropdown
-  ul:not(.dropdown-spacer):hover
+  ul:not(.dropdown-spacer):not(.highlighted):hover
   > div:first-child:not([enabled="false"])
   ~ .dropdown-expand-img,
 .dropdown-anchor.highlighted > .dropdown-expand-img,
@@ -325,11 +329,12 @@ item so any click will trigger it. */
   animation: var(--dropdown-anim-highlight-in-speed) highlight-appear;
 }
 
-/* In order to avoid triggering the fadeout animation on initial creation by 
-simply applying the fadeout to the element's default state, a menu element gets 
-a ".mouseover" class when the mouse leaves it. This class causes the fadeout 
-animation to play once the highlight condition is no longer met. */
-.mouseover {
+/* In order to avoid triggering the highlight fadeout animation on initial menu 
+open by simply applying the fadeout to each element's default state, a menu item
+gets a "mouseover" class when the mouse leaves it. This class causes the fadeout
+animation to play once the highlight condition is no longer met. The "mouseover"
+class is removed from all menu items whenever the menu reopens. */
+:not(.highlighted) > .mouseover {
   --dropdown-anim-bg-color-start: rgba(0, 0, 0, 0);
   --dropdown-anim-font-color-start: var(--dropdown-font-color);
   --dropdown-anim-bg-color-end: var(--dropdown-highlight-color);
@@ -337,7 +342,7 @@ animation to play once the highlight condition is no longer met. */
   animation: var(--dropdown-anim-highlight-out-speed) highlight-disappear;
 }
 
-.mouseover > .dropdown-right {
+:not(.highlighted) > .mouseover > .dropdown-right {
   --dropdown-anim-bg-color-start: rgba(0, 0, 0, 0);
   --dropdown-anim-font-color-start: var(--dropdown-font-disabled-color);
   --dropdown-anim-bg-color-end: rgba(0, 0, 0, 0);
@@ -345,7 +350,7 @@ animation to play once the highlight condition is no longer met. */
   animation: var(--dropdown-anim-highlight-out-speed) highlight-disappear;
 }
 
-.mouseover ~ .dropdown-expand-img {
+:not(.highlighted) > .mouseover ~ .dropdown-expand-img {
   --dropdown-anim-bg-color-start: rgba(0, 0, 0, 0);
   --dropdown-anim-font-color-start: var(--dropdown-font-color);
   --dropdown-anim-bg-color-end: rgba(0, 0, 0, 0);
