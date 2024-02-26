@@ -1,5 +1,3 @@
-// TODO: Add listeners to menu items so the menu can auto close on selection.
-
 import {
   createSvg,
   elementIsOrContainsElement,
@@ -90,6 +88,7 @@ class Dropdown {
     this.attachMouseEnterListener();
     this.attachClickListener();
     this.attachResizeListener();
+    this.attachCloseOnSelectListeners();
   }
 
   getAnchor() {
@@ -170,7 +169,7 @@ class Dropdown {
   }
 
   attachClickListener() {
-    document.addEventListener("click", (_event) => {
+    document.addEventListener("mousedown", (_event) => {
       this.closeOnClickOutsideHierarchy(_event.target);
       this.closeDeeperThanMouse(_event.clientX, _event.clientY, true);
     });
@@ -184,6 +183,23 @@ class Dropdown {
       "resize",
       this.repositionOffscreenDropdowns.bind(this)
     );
+  }
+
+  attachCloseOnSelectListeners() {
+    const itemDivs = this.htmlMenu.querySelectorAll("ul > div:first-of-type");
+
+    for (const item of itemDivs) {
+      if (
+        item.getAttribute("closeonselect") === "true" &&
+        item.getAttribute("enabled") !== "false"
+      ) {
+        item.addEventListener("mousedown", (_event) => {
+          if (_event.button === 0) {
+            this.closeHierarchy();
+          }
+        });
+      }
+    }
   }
 }
 
@@ -225,11 +241,11 @@ class DropdownOrigin {
     if (!_htmlElem.classList.contains("dropdown-anchor")) {
       popDir = _htmlElem.getAttribute("popdirection") || "right-bottom";
       this.appendSubmenuArrow();
-      this.itemElem = _htmlElem.querySelector("ul > div:first-child");
+      this.itemElem = _htmlElem.querySelector("ul > div:first-of-type");
     } else {
       popDir = _htmlElem.getAttribute("popdirection") || "bottom-rightt";
       this.itemElem = _htmlElem.querySelector(
-        ".dropdown-anchor > div:first-child"
+        ".dropdown-anchor > div:first-of-type"
       );
     }
 
@@ -380,6 +396,11 @@ class DropdownOrigin {
       if (nodeListContainsElement(underMouse, this.htmlElem)) {
         if (this.htmlElem.classList.contains("opened")) {
           this.htmlElem.classList.remove("opened");
+
+          if (this.htmlElem.classList.contains("dropdown-anchor")) {
+            this.htmlElem.classList.remove("highlighted");
+          }
+
           clearTimeout(this.menuOpenTimeout);
         } else {
           this.htmlElem.classList.add("highlighted");
@@ -397,25 +418,8 @@ class DropdownOrigin {
     }
   }
 
-  // TODO: Remove
-  removeAllHighlights(_mouseX, _mouseY) {
-    if (this.htmlElem.classList.contains("opened")) {
-      const underMouse = document.elementsFromPoint(_mouseX, _mouseY);
-
-      if (nodeListContainsElement(underMouse, this.menuElem)) {
-        for (const ul of this.menuItemUls) {
-          if (!nodeListContainsElement(underMouse, ul)) {
-            ul.classList.remove("highlighted");
-          }
-        }
-      }
-    }
-  }
-
   attachMouseEnterListener(_openOnHover) {
     this.htmlElem.addEventListener("mouseenter", () => {
-      //this.removeAllHighlights(_event.clientX, _event.clientY);
-
       if (_openOnHover) {
         this.scheduleOpenMenu();
       }
@@ -423,8 +427,10 @@ class DropdownOrigin {
   }
 
   attachClickListener() {
-    this.htmlElem.addEventListener("click", (_event) => {
-      this.toggleOpenMenu(_event.clientX, _event.clientY);
+    this.htmlElem.addEventListener("mousedown", (_event) => {
+      if (_event.button === 0) {
+        this.toggleOpenMenu(_event.clientX, _event.clientY);
+      }
     });
   }
 
@@ -434,7 +440,7 @@ class DropdownOrigin {
     });
 
     for (const ul of this.menuItemUls) {
-      const menuItem = ul.querySelector("div:first-child");
+      const menuItem = ul.querySelector("div:first-of-type");
       this.menuItemDivs.push(menuItem);
       ul.addEventListener("mouseleave", () => {
         this.addMouseoverClass(menuItem);
@@ -477,9 +483,3 @@ class DropdownOrigin {
 }
 
 new DropdownBar(document.querySelector(".dropdown-bar"));
-const saveItem = document.querySelector(".save");
-saveItem.addEventListener("click", () => {
-  if (saveItem.getAttribute("enabled") !== "false") {
-    console.log(saveItem);
-  }
-});
