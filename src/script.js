@@ -1,3 +1,5 @@
+// TODO: Add listeners to menu items so the menu can auto close on selection.
+
 import {
   createSvg,
   elementIsOrContainsElement,
@@ -196,6 +198,7 @@ class DropdownOrigin {
   menuCloseTimeout;
   hoverDelay;
   popDirection;
+  appearAnimRunning = false;
 
   static positionOffsetValues = {
     negativeAnchorHorizBorderOffset:
@@ -235,8 +238,8 @@ class DropdownOrigin {
 
     this.attachMouseEnterListener(_htmlElem.getAttribute("onset") !== "click");
     this.attachClickListener();
-
     this.attachMouseLeaveListeners();
+    this.attachAnimListeners();
   }
 
   getAllUlsAtThisDropdownLevel() {
@@ -298,6 +301,7 @@ class DropdownOrigin {
   }
 
   repositionOffscreenMenu() {
+    const screenEdgeMargin = 10;
     this.setMenuToDefaultPosition();
 
     const vw = document.documentElement.clientWidth || window.innerWidth;
@@ -312,16 +316,16 @@ class DropdownOrigin {
       .getPropertyValue("top");
     const topNum = Number(topStr.replace("px", ""));
 
-    if (rect.left <= 0) {
-      this.menuElem.style.left = `${leftNum - rect.left}px`;
-    } else if (rect.right >= vw) {
-      this.menuElem.style.left = `${leftNum - (rect.right - vw)}px`;
+    if (rect.left <= screenEdgeMargin) {
+      this.menuElem.style.left = `${leftNum - rect.left - screenEdgeMargin}px`;
+    } else if (rect.right >= vw - screenEdgeMargin) {
+      this.menuElem.style.left = `${leftNum - (rect.right - vw + screenEdgeMargin)}px`;
     }
 
-    if (rect.top <= 0) {
-      this.menuElem.style.top = `${topNum - rect.top}px`;
-    } else if (rect.bottom >= vh) {
-      this.menuElem.style.top = `${topNum - (rect.bottom - vh)}px`;
+    if (rect.top <= screenEdgeMargin) {
+      this.menuElem.style.top = `${topNum - rect.top - screenEdgeMargin}px`;
+    } else if (rect.bottom >= vh - screenEdgeMargin) {
+      this.menuElem.style.top = `${topNum - (rect.bottom - vh + screenEdgeMargin)}px`;
     }
   }
 
@@ -331,10 +335,6 @@ class DropdownOrigin {
 
   openDropdown() {
     this.htmlElem.classList.add("opened");
-
-    // TODO: Check for offscreen position after pop-in animation finishes.
-    // Currently if the animation starts fully on screen, the menu won't get
-    // repositioned even if it ends up offscreen after the animation ends.
     this.repositionOffscreenMenu();
 
     this.menuItemDivs.forEach((_div) => {
@@ -440,6 +440,39 @@ class DropdownOrigin {
         this.addMouseoverClass(menuItem);
       });
     }
+  }
+
+  attachAnimListeners() {
+    this.menuElem.addEventListener("animationend", (_event) => {
+      if (_event.animationName === "appear") {
+        this.appearAnimRunning = false;
+        this.repositionOffscreenMenu();
+      }
+    });
+
+    this.menuElem.addEventListener("animationcancel", (_event) => {
+      if (_event.animationName === "appear") {
+        this.appearAnimRunning = false;
+      }
+    });
+
+    this.menuElem.addEventListener("animationstart", (_event) => {
+      if (_event.animationName === "appear") {
+        this.appearAnimRunning = true;
+        this.updateMenuAnimPosition();
+      }
+    });
+  }
+
+  // If this lags the animation, increase the timeout interval.
+  updateMenuAnimPosition() {
+    setTimeout(() => {
+      this.repositionOffscreenMenu();
+
+      if (this.appearAnimRunning) {
+        this.updateMenuAnimPosition();
+      }
+    }, 1);
   }
 }
 

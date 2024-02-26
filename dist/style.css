@@ -100,7 +100,7 @@ places. */
   --dropdown-cursor-disabled: default;
   --dropdown-cursor-enabled-link: default;
 
-  --dropdown-anim-pop-in-speed: 0.2s;
+  --dropdown-anim-pop-in-speed: 1s;
   --dropdown-anim-pop-out-speed: 0.4s;
   --dropdown-anim-highlight-in-speed: 0.1s;
   --dropdown-anim-highlight-out-speed: 0.4s;
