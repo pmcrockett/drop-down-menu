@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./os-like-dropdown.css" />
     <script src="main.js" defer></script>
     <title>os-like-dropdown demo</title>
   </head>
-  <body>
+  <body style="margin: 32px">
     <div class="log-text" style="min-height: 64px"></div>
     <div class="dropdown-bar" direction="horizontal">
       <button
@@ -30,11 +30,7 @@
               <div class="dropdown-right">Ctrl+O</div>
             </div>
           </div>
-          <div
-            class="dropdown-expand"
-            popdirection="right-bottom"
-            onset="hover"
-          >
+          <div class="dropdown-expand" popdirection="right-bottom">
             <div id="open-recent" enabled="true">Open recent</div>
             <div class="dropdown">
               <div class="dropdown-item">
@@ -87,7 +83,6 @@
       </button>
       <button
         class="dropdown-anchor"
-        onset="click"
         hoverdelay="300"
         popdirection="bottom-right"
       >
@@ -115,7 +110,6 @@
       </button>
       <button
         class="dropdown-anchor"
-        onset="click"
         hoverdelay="300"
         popdirection="bottom-right"
       >
@@ -143,17 +137,12 @@
       </button>
       <button
         class="dropdown-anchor"
-        onset="click"
         hoverdelay="300"
         popdirection="bottom-right"
       >
         <div>Help</div>
         <div class="dropdown">
-          <div
-            class="dropdown-expand"
-            popdirection="right-bottom"
-            onset="hover"
-          >
+          <div class="dropdown-expand" popdirection="right-bottom">
             <div id="documents" enabled="true">Documents</div>
             <div class="dropdown">
               <div class="dropdown-item">
@@ -169,65 +158,6 @@
           </div>
           <div class="dropdown-item">
             <div id="about" closeonselect="true">About...</div>
-          </div>
-        </div>
-      </button>
-    </div>
-
-    <!-- Creates a menu bar. -->
-    <div class="dropdown-bar">
-      <!-- Creates a dropdown menu on the bar. -->
-      <button class="dropdown-anchor">
-        <!-- Creates the text for the dropdown anchor. -->
-        <div>Anchor</div>
-        <!-- Wraps the content of the dropdown menu. -->
-        <div class="dropdown">
-          <!-- Creates a menu item. -->
-          <div class="dropdown-item">
-            <!-- Creates the text and content of the menu item. -->
-            <div>Menu item</div>
-            <!-- Creates an optional link for the menu item if you don't want to
-        implement a click listener. -->
-            <a href="https://some-web-address"></a>
-          </div>
-          <!-- Creates a menu item that is an unselectable horizontal rule. -->
-          <div class="dropdown-spacer"></div>
-          <!-- Creates a menu item that expands into a submenu. -->
-          <div class="dropdown-expand">
-            <!-- Creates the text for the menu item. -->
-            <div>Submenu</div>
-            <!-- Wraps the content of the submenu. -->
-            <div class="dropdown">
-              <div class="dropdown-item">
-                <!-- This menu item doesn't use a web link. -->
-                <div>No web link</div>
-              </div>
-              <div class="dropdown-item">
-                <!-- This menu item includes an icon to the left of its text. -->
-                <div>
-                  <div class="dropdown-left">
-                    <img src="./image.svg" />Includes icon
-                  </div>
-                </div>
-              </div>
-              <div class="dropdown-item">
-                <!-- This menu item includes a shortcut description to the right of
-            its text. -->
-                <div>
-                  Includes shortcut
-                  <div class="dropdown-right">Ctrl+I</div>
-                </div>
-              </div>
-              <div class="dropdown-item">
-                <!-- This menu item has both an icon and a shortcut description. -->
-                <div>
-                  <div class="dropdown-left">
-                    <img src="./image.svg" />Icon and shortcut
-                  </div>
-                  <div class="dropdown-right">Ctrl+Shift+I</div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </button>
