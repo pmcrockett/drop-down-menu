@@ -1,69 +1,9 @@
-@keyframes appear {
-  0% {
-    position: absolute;
-    display: none;
-    opacity: 0;
-    transform: scale(0, 0);
-  }
-
-  100% {
-    position: absolute;
-    display: block;
-    opacity: 1;
-    transform: scale(1, 1);
-  }
-}
-
-@keyframes disappear {
-  0% {
-    position: absolute;
-    display: block;
-    opacity: 1;
-    transform: scale(1, 1);
-  }
-
-  100% {
-    position: absolute;
-    display: none;
-    opacity: 0;
-    transform: scale(0, 0);
-  }
-}
-
-@keyframes highlight-appear {
-  0% {
-    background-color: var(--dropdown-anim-bg-color-start);
-    fill: var(--dropdown-anim-font-color-start);
-    color: var(--dropdown-anim-font-color-start);
-  }
-
-  100% {
-    background-color: var(--dropdown-anim-bg-color-end);
-    fill: var(--dropdown-anim-font-color-end);
-    color: var(--dropdown-anim-font-color-end);
-  }
-}
-
-@keyframes highlight-disappear {
-  0% {
-    background-color: var(--dropdown-anim-bg-color-end);
-    fill: var(--dropdown-anim-font-color-end);
-    color: var(--dropdown-anim-font-color-end);
-  }
-
-  100% {
-    background-color: var(--dropdown-anim-bg-color-start);
-    fill: var(--dropdown-anim-font-color-start);
-    color: var(--dropdown-anim-font-color-start);
-  }
-}
-
 /* If a styling element is included as a varible, edit the variable rather than
 editing the property directly, because the value may be used in multiple 
 places. */
 .dropdown-anchor {
-  --dropdown-anchor-padding-horiz: 6px;
-  --dropdown-anchor-padding-vert: 4px;
+  --dropdown-anchor-padding-horiz: 0.45em;
+  --dropdown-anchor-padding-vert: 0.3em;
   --dropdown-anchor-border-width-horiz: 0px;
   --dropdown-anchor-border-width-vert: 1px;
 
@@ -85,7 +25,9 @@ places. */
   --dropdown-font-color: rgb(65, 53, 38);
   --dropdown-font-disabled-color: rgb(177, 147, 107);
   --dropdown-font-highlight-color: antiquewhite;
+
   --dropdown-font-size: 14px;
+  --dropdown-anchor-font-size: 13.5px;
 
   --dropdown-icon-size: 1.1em;
 
@@ -111,6 +53,7 @@ places. */
   width: fit-content;
   position: relative;
   font-family: Arial, Helvetica, sans-serif;
+  font-size: var(--dropdown-anchor-font-size);
   cursor: var(--dropdown-cursor-enabled);
 }
 
@@ -284,7 +227,7 @@ item so any click will trigger it. */
   --dropdown-anim-font-color-start: var(--dropdown-font-color);
   --dropdown-anim-bg-color-end: var(--dropdown-highlight-color);
   --dropdown-anim-font-color-end: var(--dropdown-font-highlight-color);
-  animation: var(--dropdown-anim-highlight-in-speed) highlight-appear;
+  animation: var(--dropdown-anim-highlight-in-speed) dropdown-highlight-appear;
 }
 
 /* Slightly different fade in for highlight on the menu anchor. */
@@ -304,7 +247,7 @@ item so any click will trigger it. */
   --dropdown-anim-font-color-start: var(--dropdown-font-disabled-color);
   --dropdown-anim-bg-color-end: rgba(0, 0, 0, 0);
   --dropdown-anim-font-color-end: var(--dropdown-font-highlight-color);
-  animation: var(--dropdown-anim-highlight-in-speed) highlight-appear;
+  animation: var(--dropdown-anim-highlight-in-speed) dropdown-highlight-appear;
 }
 
 /* Highlighted submenu arrow. */
@@ -319,7 +262,7 @@ item so any click will trigger it. */
   --dropdown-anim-font-color-start: var(--dropdown-font-color);
   --dropdown-anim-bg-color-end: rgba(0, 0, 0, 0);
   --dropdown-anim-font-color-end: var(--dropdown-font-highlight-color);
-  animation: var(--dropdown-anim-highlight-in-speed) highlight-appear;
+  animation: var(--dropdown-anim-highlight-in-speed) dropdown-highlight-appear;
 }
 
 /* In order to avoid triggering the highlight fadeout animation on initial menu 
@@ -327,35 +270,38 @@ open by simply applying the fadeout to each element's default state, a menu item
 gets a "mouseover" class when the mouse leaves it. This class causes the fadeout
 animation to play once the highlight condition is no longer met. The "mouseover"
 class is removed from all menu items whenever the menu reopens. */
-:not(.highlighted) > .mouseover {
+.dropdown-anchor :not(.highlighted) > .mouseover {
   --dropdown-anim-bg-color-start: rgba(0, 0, 0, 0);
   --dropdown-anim-font-color-start: var(--dropdown-font-color);
   --dropdown-anim-bg-color-end: var(--dropdown-highlight-color);
   --dropdown-anim-font-color-end: var(--dropdown-font-highlight-color);
-  animation: var(--dropdown-anim-highlight-out-speed) highlight-disappear;
+  animation: var(--dropdown-anim-highlight-out-speed)
+    dropdown-highlight-disappear;
 }
 
-:not(.highlighted) > .mouseover > .dropdown-right {
+.dropdown-anchor :not(.highlighted) > .mouseover > .dropdown-right {
   --dropdown-anim-bg-color-start: rgba(0, 0, 0, 0);
   --dropdown-anim-font-color-start: var(--dropdown-font-disabled-color);
   --dropdown-anim-bg-color-end: rgba(0, 0, 0, 0);
   --dropdown-anim-font-color-end: var(--dropdown-font-highlight-color);
-  animation: var(--dropdown-anim-highlight-out-speed) highlight-disappear;
+  animation: var(--dropdown-anim-highlight-out-speed)
+    dropdown-highlight-disappear;
 }
 
-:not(.highlighted) > .mouseover ~ .dropdown-expand-img {
+.dropdown-anchor :not(.highlighted) > .mouseover ~ .dropdown-expand-img {
   --dropdown-anim-bg-color-start: rgba(0, 0, 0, 0);
   --dropdown-anim-font-color-start: var(--dropdown-font-color);
   --dropdown-anim-bg-color-end: rgba(0, 0, 0, 0);
   --dropdown-anim-font-color-end: var(--dropdown-font-highlight-color);
-  animation: var(--dropdown-anim-highlight-out-speed) highlight-disappear;
+  animation: var(--dropdown-anim-highlight-out-speed)
+    dropdown-highlight-disappear;
 }
 
 /* Closed menu's hidden state. */
 .dropdown-anchor > .dropdown,
 .dropdown-expand > .dropdown {
   display: none;
-  animation: var(--dropdown-anim-pop-out-speed) disappear;
+  animation: var(--dropdown-anim-pop-out-speed) dropdown-disappear;
 }
 
 /* Opened menu's visible state. */
@@ -363,9 +309,65 @@ class is removed from all menu items whenever the menu reopens. */
 .dropdown-expand.opened > .dropdown {
   display: block;
   position: absolute;
-  animation: var(--dropdown-anim-pop-in-speed) appear;
+  animation: var(--dropdown-anim-pop-in-speed) dropdown-appear;
 }
 
-.hidden {
-  display: none;
+@keyframes dropdown-appear {
+  0% {
+    position: absolute;
+    display: none;
+    opacity: 0;
+    transform: scale(0, 0);
+  }
+
+  100% {
+    position: absolute;
+    display: block;
+    opacity: 1;
+    transform: scale(1, 1);
+  }
+}
+
+@keyframes dropdown-disappear {
+  0% {
+    position: absolute;
+    display: block;
+    opacity: 1;
+    transform: scale(1, 1);
+  }
+
+  100% {
+    position: absolute;
+    display: none;
+    opacity: 0;
+    transform: scale(0, 0);
+  }
+}
+
+@keyframes dropdown-highlight-appear {
+  0% {
+    background-color: var(--dropdown-anim-bg-color-start);
+    fill: var(--dropdown-anim-font-color-start);
+    color: var(--dropdown-anim-font-color-start);
+  }
+
+  100% {
+    background-color: var(--dropdown-anim-bg-color-end);
+    fill: var(--dropdown-anim-font-color-end);
+    color: var(--dropdown-anim-font-color-end);
+  }
+}
+
+@keyframes dropdown-highlight-disappear {
+  0% {
+    background-color: var(--dropdown-anim-bg-color-end);
+    fill: var(--dropdown-anim-font-color-end);
+    color: var(--dropdown-anim-font-color-end);
+  }
+
+  100% {
+    background-color: var(--dropdown-anim-bg-color-start);
+    fill: var(--dropdown-anim-font-color-start);
+    color: var(--dropdown-anim-font-color-start);
+  }
 }

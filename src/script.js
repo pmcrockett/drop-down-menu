@@ -1,8 +1,8 @@
-import createMenus, { getMenuItems } from "./os-like-dropdown.js";
+import * as menu from "./os-like-dropdown.js";
 
-createMenus();
+menu.createDropdowns();
 
-const menuItems = getMenuItems();
+const menuItems = menu.getDropdownItems();
 const logTextElem = document.querySelector(".log-text");
 
 menuItems.forEach((_item) => {

@@ -221,6 +221,7 @@ class DropdownOrigin {
   hoverDelay;
   popDirection;
   appearAnimRunning = false;
+  isAnchor;
 
   static positionOffsetValues = {
     negativeAnchorHorizBorderOffset:
@@ -242,9 +243,10 @@ class DropdownOrigin {
     this.htmlElem = _htmlElem;
     this.menuElem = _htmlElem.querySelector(".dropdown");
     this.menuItemOuterDivs = this.getAllMenuItemsAtThisDropdownLevel();
+    this.isAnchor = this.htmlElem.classList.contains("dropdown-anchor");
     let popDir;
 
-    if (!_htmlElem.classList.contains("dropdown-anchor")) {
+    if (!this.isAnchor) {
       popDir = _htmlElem.getAttribute("popdirection") || "right-bottom";
       this.appendSubmenuArrow();
       this.itemElem = _htmlElem.querySelector(
@@ -260,7 +262,13 @@ class DropdownOrigin {
     this.popDirection = popDir.split("-");
     this.hoverDelay = _hoverDelay || defaultHoverDelay;
 
-    this.attachMouseEnterListener(_htmlElem.getAttribute("onset") !== "click");
+    let openOnHover = _htmlElem.getAttribute("onset");
+
+    if (!openOnHover) {
+      openOnHover = this.isAnchor ? "false" : "true";
+    }
+
+    this.attachMouseEnterListener(openOnHover === "true");
     this.attachClickListener();
     this.attachMouseLeaveListeners();
     this.attachAnimListeners();
@@ -299,7 +307,7 @@ class DropdownOrigin {
     // Offset in the first direction does not correct for border width; offset
     // in the second direction does. An anchor may have separate horizontal and
     // vertical border widths.
-    if (this.htmlElem.classList.contains("dropdown-anchor")) {
+    if (this.isAnchor) {
       if (this.popDirection[1] === "right" || this.popDirection[1] === "left") {
         secondOffset =
           DropdownOrigin.positionOffsetValues.negativeAnchorHorizBorderOffset;
@@ -405,7 +413,7 @@ class DropdownOrigin {
         if (this.htmlElem.classList.contains("opened")) {
           this.htmlElem.classList.remove("opened");
 
-          if (this.htmlElem.classList.contains("dropdown-anchor")) {
+          if (this.isAnchor) {
             this.htmlElem.classList.remove("highlighted");
           }
 
@@ -467,20 +475,20 @@ class DropdownOrigin {
 
   attachAnimListeners() {
     this.menuElem.addEventListener("animationend", (_event) => {
-      if (_event.animationName === "appear") {
+      if (_event.animationName === "dropdown-appear") {
         this.appearAnimRunning = false;
         this.repositionOffscreenMenu();
       }
     });
 
     this.menuElem.addEventListener("animationcancel", (_event) => {
-      if (_event.animationName === "appear") {
+      if (_event.animationName === "dropdown-appear") {
         this.appearAnimRunning = false;
       }
     });
 
     this.menuElem.addEventListener("animationstart", (_event) => {
-      if (_event.animationName === "appear") {
+      if (_event.animationName === "dropdown-appear") {
         this.appearAnimRunning = true;
         this.updateMenuAnimPosition();
       }
@@ -501,7 +509,7 @@ class DropdownOrigin {
 
 // Calling this function from the code that imports it will read the dropdown
 // structures in the HTML and construct full dropdown menus out of them.
-export default function () {
+export function createDropdowns() {
   const htmlMenuBars = document.querySelectorAll(".dropdown-bar");
   const htmlLoneAnchors = document.querySelectorAll(
     "*:not(.dropdown-bar) > div.dropdown-anchor, *:not(.dropdown-bar) > button.dropdown-anchor"
@@ -524,7 +532,7 @@ export default function () {
   };
 }
 
-export function getMenuItems(_source) {
+export function getDropdownItems(_source) {
   if (!_source) {
     return document.querySelectorAll(".dropdown > div > div:first-of-type");
   } else if (_source instanceof DropdownBar) {

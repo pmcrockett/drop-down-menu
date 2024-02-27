@@ -1,4 +1,7 @@
-# Same as .gitignore except that it also ignores dist/main.js.
+# Same as .gitignore except that it also ignores dist/main.js and *.md.
+
+# Markdown
+*.md
 
 # Logs
 logs
