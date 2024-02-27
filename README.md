@@ -141,7 +141,7 @@ pops. The first direction determines the side of the anchor the menu appears on
 and the second direction determines the direction in which the menu's other 
 axis is allowed to expand.
 
-**`enabled`**: **`true`** | `false` 
+**`enabled`**: **`"true"`** | `"false"` 
 Whether the menu button is enabled. If not enabled, the button's text will be
 grayed out using the color defined with `--dropdown-disabled-font-color` and
 will not pop its menu if pressed. If a link is applied with an `<a>` tag, it 
