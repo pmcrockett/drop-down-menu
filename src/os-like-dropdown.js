@@ -74,7 +74,7 @@ class Dropdown {
   htmlAnchor;
 
   // _htmlDropdownAnchor is a <div class="dropdown-anchor"> or
-  // <button class="dropdown-anchor"> that contains at least one <ul> with menu
+  // <button class="dropdown-anchor"> that contains at least one <div> with menu
   // item data.
   constructor(_htmlDropdownAnchor) {
     this.htmlAnchor = _htmlDropdownAnchor;
@@ -190,7 +190,9 @@ class Dropdown {
   }
 
   attachCloseOnSelectListeners() {
-    const itemDivs = this.htmlAnchor.querySelectorAll("ul > div:first-of-type");
+    const itemDivs = this.htmlAnchor.querySelectorAll(
+      ".dropdown > div > div:first-of-type"
+    );
 
     for (const item of itemDivs) {
       if (
@@ -212,8 +214,8 @@ class DropdownOrigin {
   htmlElem;
   menuElem;
   itemElem;
-  menuItemUls;
-  menuItemDivs = [];
+  menuItemOuterDivs;
+  menuItemContentDivs = [];
   menuOpenTimeout;
   menuCloseTimeout;
   hoverDelay;
@@ -239,15 +241,17 @@ class DropdownOrigin {
   constructor(_htmlElem, _hoverDelay) {
     this.htmlElem = _htmlElem;
     this.menuElem = _htmlElem.querySelector(".dropdown");
-    this.menuItemUls = this.getAllUlsAtThisDropdownLevel();
+    this.menuItemOuterDivs = this.getAllMenuItemsAtThisDropdownLevel();
     let popDir;
 
     if (!_htmlElem.classList.contains("dropdown-anchor")) {
       popDir = _htmlElem.getAttribute("popdirection") || "right-bottom";
       this.appendSubmenuArrow();
-      this.itemElem = _htmlElem.querySelector("ul > div:first-of-type");
+      this.itemElem = _htmlElem.querySelector(
+        ".dropdown > div > div:first-of-type"
+      );
     } else {
-      popDir = _htmlElem.getAttribute("popdirection") || "bottom-rightt";
+      popDir = _htmlElem.getAttribute("popdirection") || "bottom-right";
       this.itemElem = _htmlElem.querySelector(
         ".dropdown-anchor > div:first-of-type"
       );
@@ -262,22 +266,22 @@ class DropdownOrigin {
     this.attachAnimListeners();
   }
 
-  getAllUlsAtThisDropdownLevel() {
-    const uls = [this.menuElem.querySelector("ul")];
-    let nextUl = uls[0].nextSibling;
+  getAllMenuItemsAtThisDropdownLevel() {
+    const divs = [this.menuElem.querySelector(".dropdown > div")];
+    let nextDiv = divs[0].nextSibling;
 
-    while (nextUl) {
+    while (nextDiv) {
       if (
-        nextUl.nodeType === 1 &&
-        !nextUl.classList.contains("dropdown-spacer")
+        nextDiv.nodeType === 1 &&
+        !nextDiv.classList.contains("dropdown-spacer")
       ) {
-        uls.push(nextUl);
+        divs.push(nextDiv);
       }
 
-      nextUl = nextUl.nextSibling;
+      nextDiv = nextDiv.nextSibling;
     }
 
-    return uls;
+    return divs;
   }
 
   appendSubmenuArrow() {
@@ -357,7 +361,7 @@ class DropdownOrigin {
     this.htmlElem.classList.add("opened");
     this.repositionOffscreenMenu();
 
-    this.menuItemDivs.forEach((_div) => {
+    this.menuItemContentDivs.forEach((_div) => {
       _div.classList.remove("mouseover");
     });
 
@@ -441,12 +445,21 @@ class DropdownOrigin {
   attachMouseLeaveListeners() {
     this.htmlElem.addEventListener("mouseleave", (_event) => {
       this.scheduleCloseMenu(_event.clientX, _event.clientY);
+
+      // If we're hovering over a hover-to-open anchor and move away before it
+      // opens the dropdown, remove the highlight.
+      if (
+        this.htmlElem.getAttribute("onset") !== "click" &&
+        !this.htmlElem.classList.contains("opened")
+      ) {
+        this.htmlElem.classList.remove("highlighted");
+      }
     });
 
-    for (const ul of this.menuItemUls) {
-      const menuItem = ul.querySelector("div:first-of-type");
-      this.menuItemDivs.push(menuItem);
-      ul.addEventListener("mouseleave", () => {
+    for (const div of this.menuItemOuterDivs) {
+      const menuItem = div.querySelector(".dropdown > div > div:first-of-type");
+      this.menuItemContentDivs.push(menuItem);
+      div.addEventListener("mouseleave", () => {
         this.addMouseoverClass(menuItem);
       });
     }
@@ -513,10 +526,14 @@ export default function () {
 
 export function getMenuItems(_source) {
   if (!_source) {
-    return document.querySelectorAll("ul > div:first-of-type");
+    return document.querySelectorAll(".dropdown > div > div:first-of-type");
   } else if (_source instanceof DropdownBar) {
-    return _source.htmlBar.querySelectorAll("ul > div:first-of-type");
+    return _source.htmlBar.querySelectorAll(
+      ".dropdown > div > div:first-of-type"
+    );
   } else if (_source instanceof Dropdown) {
-    return _source.htmlAnchor.querySelectorAll("ul > div:first-of-type");
+    return _source.htmlAnchor.querySelectorAll(
+      ".dropdown > div > div:first-of-type"
+    );
   }
 }
