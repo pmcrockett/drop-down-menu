@@ -28,9 +28,11 @@ get only the items present in that menu bar or menu anchor.
 
 # Basic dropdown anatomy
 
-The following HTML creates this menu:
+The following code creates this menu:
 
 !["Dropdown example"](./images/dropdown-demo1.jpg?raw=true "Dropdown example")
+
+#### HTML
 
 ```html
 <!-- Creates a menu bar. -->
@@ -91,6 +93,15 @@ The following HTML creates this menu:
     </div>
   </button>
 </div>
+```
+
+#### JavaScript
+
+```javascript
+import * as menu from "./os-like-dropdown.js";
+
+menu.createDropdowns();
+
 ```
 
 # HTML elements
