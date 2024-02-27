@@ -117,13 +117,14 @@ inside of this bar creates menu items on the bar.
 ```html
 <div class="dropdown-bar">
 !!<button class="dropdown-anchor">!!!!!!!!!!!!!!!!
-    <div>Anchor</div>
+!!!!<div>Anchor</div>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     <div class="dropdown">
 ```
 
 Creates a button that pops a dropdown menu. Can be nested inside of
-`<div class="dropdown-bar">` but doesn't need to be. Nesting
-`<div class="dropdown">` inside of the button creates the actual menu.
+`<div class="dropdown-bar">` but doesn't need to be. The inner unclassed 
+`<div>` contains the button text. Nesting `<div class="dropdown">` inside of 
+the button after the text creates the actual menu.
 
 #### Attributes (default value in bold):
 
