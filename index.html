@@ -18,36 +18,40 @@
       >
         <div>File</div>
         <div class="dropdown">
-          <ul>
+          <div class="dropdown-item">
             <div id="new" closeonselect="true">
               New...
               <div class="dropdown-right">Ctrl+N</div>
             </div>
-          </ul>
-          <ul>
+          </div>
+          <div class="dropdown-item">
             <div id="open" closeonselect="true">
               Open...
               <div class="dropdown-right">Ctrl+O</div>
             </div>
-          </ul>
-          <ul class="dropdown-expand" popdirection="right-bottom" onset="hover">
+          </div>
+          <div
+            class="dropdown-expand"
+            popdirection="right-bottom"
+            onset="hover"
+          >
             <div id="open-recent" enabled="true">Open recent</div>
             <div class="dropdown">
-              <ul>
+              <div class="dropdown-item">
                 <div id="recent-0" closeonselect="true">
                   <div class="dropdown-left">
                     <img src="./image.svg" />another_cat_picture.jpg
                   </div>
                 </div>
-              </ul>
-              <ul>
+              </div>
+              <div class="dropdown-item">
                 <div id="recent-1" closeonselect="true">
                   <div class="dropdown-left">
                     <img src="./image.svg" />clown_fiasco.jpg
                   </div>
                 </div>
-              </ul>
-              <ul>
+              </div>
+              <div class="dropdown-item">
                 <div id="recent-2" closeonselect="true">
                   <div class="dropdown-left">
                     <img
@@ -56,29 +60,29 @@
                     />this-is-not-a-pipe.jpg
                   </div>
                 </div>
-              </ul>
+              </div>
             </div>
-          </ul>
-          <ul class="dropdown-spacer"></ul>
-          <ul>
+          </div>
+          <div class="dropdown-spacer"></div>
+          <div class="dropdown-item">
             <div id="save" enabled="false" closeonselect="true">
               Save
               <div class="dropdown-right">Ctrl+S</div>
             </div>
-          </ul>
-          <ul>
+          </div>
+          <div class="dropdown-item">
             <div id="save-as" enabled="false" closeonselect="true">
               Save as...
               <div class="dropdown-right">Ctrl+Shift+S</div>
             </div>
-          </ul>
-          <ul class="dropdown-spacer"></ul>
-          <ul>
+          </div>
+          <div class="dropdown-spacer"></div>
+          <div class="dropdown-item">
             <div id="exit" closeonselect="true">
               Exit
               <div class="dropdown-right">Ctrl+Q</div>
             </div>
-          </ul>
+          </div>
         </div>
       </button>
       <button
@@ -89,24 +93,24 @@
       >
         <div>Edit</div>
         <div class="dropdown">
-          <ul>
+          <div class="dropdown-item">
             <div id="copy" closeonselect="true">
               Copy
               <div class="dropdown-right">Ctrl+C</div>
             </div>
-          </ul>
-          <ul>
+          </div>
+          <div class="dropdown-item">
             <div id="cut" closeonselect="true">
               Cut
               <div class="dropdown-right">Ctrl+X</div>
             </div>
-          </ul>
-          <ul>
+          </div>
+          <div class="dropdown-item">
             <div id="paste" closeonselect="true">
               Paste
               <div class="dropdown-right">Ctrl+V</div>
             </div>
-          </ul>
+          </div>
         </div>
       </button>
       <button
@@ -117,24 +121,24 @@
       >
         <div>Select</div>
         <div class="dropdown">
-          <ul>
+          <div class="dropdown-item">
             <div id="select-all" closeonselect="true">
               All
               <div class="dropdown-right">Ctrl+A</div>
             </div>
-          </ul>
-          <ul>
+          </div>
+          <div class="dropdown-item">
             <div id="select-none" closeonselect="true">None</div>
-          </ul>
-          <ul>
+          </div>
+          <div class="dropdown-item">
             <div id="select-invert" closeonselect="true">
               Invert
               <div class="dropdown-right">Ctrl+I</div>
             </div>
-          </ul>
-          <ul>
+          </div>
+          <div class="dropdown-item">
             <div id="select-by-color" closeonselect="true">By color</div>
-          </ul>
+          </div>
         </div>
       </button>
       <button
@@ -145,23 +149,86 @@
       >
         <div>Help</div>
         <div class="dropdown">
-          <ul class="dropdown-expand" popdirection="right-bottom" onset="hover">
+          <div
+            class="dropdown-expand"
+            popdirection="right-bottom"
+            onset="hover"
+          >
             <div id="documents" enabled="true">Documents</div>
             <div class="dropdown">
-              <ul>
+              <div class="dropdown-item">
                 <div id="quick-help" closeonselect="true">
                   Quick help...
                   <div class="dropdown-right">Ctrl+H</div>
                 </div>
-              </ul>
-              <ul>
+              </div>
+              <div class="dropdown-item">
                 <div id="online-help" closeonselect="true">Online help...</div>
-              </ul>
+              </div>
             </div>
-          </ul>
-          <ul>
+          </div>
+          <div class="dropdown-item">
             <div id="about" closeonselect="true">About...</div>
-          </ul>
+          </div>
+        </div>
+      </button>
+    </div>
+
+    <!-- Creates a menu bar. -->
+    <div class="dropdown-bar">
+      <!-- Creates a dropdown menu on the bar. -->
+      <button class="dropdown-anchor">
+        <!-- Creates the text for the dropdown anchor. -->
+        <div>Anchor</div>
+        <!-- Wraps the content of the dropdown menu. -->
+        <div class="dropdown">
+          <!-- Creates a menu item. -->
+          <div class="dropdown-item">
+            <!-- Creates the text and content of the menu item. -->
+            <div>Menu item</div>
+            <!-- Creates an optional link for the menu item if you don't want to
+        implement a click listener. -->
+            <a href="https://some-web-address"></a>
+          </div>
+          <!-- Creates a menu item that is an unselectable horizontal rule. -->
+          <div class="dropdown-spacer"></div>
+          <!-- Creates a menu item that expands into a submenu. -->
+          <div class="dropdown-expand">
+            <!-- Creates the text for the menu item. -->
+            <div>Submenu</div>
+            <!-- Wraps the content of the submenu. -->
+            <div class="dropdown">
+              <div class="dropdown-item">
+                <!-- This menu item doesn't use a web link. -->
+                <div>No web link</div>
+              </div>
+              <div class="dropdown-item">
+                <!-- This menu item includes an icon to the left of its text. -->
+                <div>
+                  <div class="dropdown-left">
+                    <img src="./image.svg" />Includes icon
+                  </div>
+                </div>
+              </div>
+              <div class="dropdown-item">
+                <!-- This menu item includes a shortcut description to the right of
+            its text. -->
+                <div>
+                  Includes shortcut
+                  <div class="dropdown-right">Ctrl+I</div>
+                </div>
+              </div>
+              <div class="dropdown-item">
+                <!-- This menu item has both an icon and a shortcut description. -->
+                <div>
+                  <div class="dropdown-left">
+                    <img src="./image.svg" />Icon and shortcut
+                  </div>
+                  <div class="dropdown-right">Ctrl+Shift+I</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </button>
     </div>

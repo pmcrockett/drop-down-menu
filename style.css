@@ -115,8 +115,8 @@ places. */
 }
 
 /* Throughout, "div:first-of-type" refers to the tag surrounding the menu item 
-content. "div:first-of-type" occurs either as a child of 
-"button.dropdown-anchor" or as a child of "ul". */
+content. "div:first-of-type" occurs as a child of "button.dropdown-anchor", 
+".dropdown-item" "dropdown-expand". */
 .dropdown-anchor > div:first-of-type {
   padding: var(--dropdown-anchor-padding-vert)
     var(--dropdown-anchor-padding-horiz) var(--dropdown-anchor-padding-vert)
@@ -157,7 +157,7 @@ content. "div:first-of-type" occurs either as a child of
   margin: 0px;
 }
 
-.dropdown ul {
+.dropdown > div {
   padding: 0px;
   min-width: max-content;
   text-align: left;
@@ -169,7 +169,7 @@ content. "div:first-of-type" occurs either as a child of
 }
 
 /* Show disabled font/cursor if menu item is disabled. */
-.dropdown ul > div:first-of-type[enabled="false"],
+.dropdown > div > div:first-of-type[enabled="false"],
 .dropdown-anchor > div:first-of-type[enabled="false"] {
   color: var(--dropdown-font-disabled-color);
   cursor: var(--dropdown-cursor-disabled);
@@ -177,7 +177,7 @@ content. "div:first-of-type" occurs either as a child of
 
 /* If an <a> tag is present in the menu item, stretch it over the entire menu 
 item so any click will trigger it. */
-.dropdown ul > div:first-of-type ~ a {
+.dropdown > div > div:first-of-type ~ a {
   grid-area: 1 / 1 / 2 / 2;
   height: 100%;
   width: 100%;
@@ -186,7 +186,7 @@ item so any click will trigger it. */
 
 /* Hide the <a> tag, making it unclickable, if the menu item is disabled. The 
 <a> tag has no visible content, so hiding it has no visual effect. */
-.dropdown ul > div:first-of-type[enabled="false"] ~ a {
+.dropdown > div > div:first-of-type[enabled="false"] ~ a {
   display: none;
 }
 
@@ -209,7 +209,7 @@ item so any click will trigger it. */
 }
 
 /* Default styling for menu item content. */
-.dropdown ul > div:first-of-type {
+.dropdown > div > div:first-of-type {
   color: inherit;
   grid-area: 1 / 1 / 2 / 2;
   display: grid;
@@ -268,13 +268,13 @@ item so any click will trigger it. */
 }
 
 /* Disabled arrow. */
-.dropdown ul > div:first-of-type[enabled="false"] ~ .dropdown-expand-img {
+.dropdown > div > div:first-of-type[enabled="false"] ~ .dropdown-expand-img {
   fill: var(--dropdown-font-disabled-color);
 }
 
 /* Highlighted menu item/anchor. */
 .dropdown
-  ul:not(.dropdown-spacer):not(.highlighted):hover
+  > div:not(.dropdown-spacer):not(.highlighted):hover
   > div:first-of-type:not([enabled="false"]),
 .dropdown-anchor.highlighted > div:first-of-type:not([enabled="false"]),
 .dropdown-expand.highlighted {
@@ -294,7 +294,7 @@ item so any click will trigger it. */
 
 /* Highlighted shortcut text. */
 .dropdown
-  ul:not(.dropdown-spacer):not(.highlighted):hover
+  > div:not(.dropdown-spacer):not(.highlighted):hover
   > div:not([enabled="false"])
   > .dropdown-right,
 .dropdown-anchor.highlighted > div > .dropdown-right,
@@ -309,7 +309,7 @@ item so any click will trigger it. */
 
 /* Highlighted submenu arrow. */
 .dropdown
-  ul:not(.dropdown-spacer):not(.highlighted):hover
+  > div:not(.dropdown-spacer):not(.highlighted):hover
   > div:first-of-type:not([enabled="false"])
   ~ .dropdown-expand-img,
 .dropdown-anchor.highlighted > .dropdown-expand-img,
